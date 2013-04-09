@@ -16,7 +16,6 @@
         <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
 
         <script language="javascript" src="http://code.jquery.com/jquery-1.4.2.js" ></script>
-        <script src="js/libs/kineticjs-4.3.1/kinetic.min.js"></script>
 
     </head>
     <body>
@@ -40,15 +39,22 @@
         <div class="main-container">
             <div class="main wrapper clearfix">
 
-                <section id="container">
+                <section>
+					<div id="container" style="border: 1px solid black"></div>
                     <button id="limpiar" onclick="limpiarCanvas()">Limpiar</button>
                     <button id="unidad" onclick="meterCubo()">Unidad</button>
-
-                    <!--<canvas id="miCanvas" width="100" height="400" style="border: 1px solid black">Tu navegador no soporta canvas</canvas>-->
+					<script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.4.1.min.js"></script>
                     <script defer="defer">
 
                         var container;
-
+						
+						var stage = new Kinetic.Stage({
+                            container: 'container',
+                            width: 400,
+                            height: 300
+                        });
+						
+						
                         $(document).ready(function() {
                             container = $('#container');
                             var padre = $(container).parent();
@@ -57,18 +63,15 @@
 
                             function redimensionaCanvas() {
                                 container.attr('width', $(padre).width());
-                                //canvas.attr('height', $(container).height());
+								stage.setWidth($(padre).width());
+								alert("no redimensiones");
                             }
 
                             redimensionaCanvas();
 
                         });
 
-                        var stage = new Kinetic.Stage({
-                            container: 'container',
-                            width: $(container).width(),
-                            height: 300
-                        });
+                        
 
                         var layer = new Kinetic.Layer();
 
@@ -90,8 +93,8 @@
                                     x: offsetX,
                                     y: 0,
                                     image: img,
-                                    width: 100,
-                                    height: 100,
+                                    width: 54,
+                                    height: 55,
                                     draggable: true
                                 });
 
@@ -102,7 +105,7 @@
                                 //contexto.drawImage(img, offsetX, 0); // Or at whatever offset you like
                             };
 
-                            img.src = "/Didactica/img/cubo.png";
+                            img.src = "img/cubo.png";
                             offsetX += 30;
 
                         }
