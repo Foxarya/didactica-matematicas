@@ -41,7 +41,9 @@
             <div class="main wrapper clearfix">
 
                 <section id="container">
-                    <button id="unidad">Unidad</button>
+                    <button id="limpiar" onclick="limpiarCanvas()">Limpiar</button>
+                    <button id="unidad" onclick="meterCubo()">Unidad</button>
+
                     <!--<canvas id="miCanvas" width="100" height="400" style="border: 1px solid black">Tu navegador no soporta canvas</canvas>-->
                     <script defer="defer">
 
@@ -50,7 +52,7 @@
                         $(document).ready(function() {
                             container = $('#container');
                             var padre = $(container).parent();
-                            
+
                             $(window).resize(redimensionaCanvas);
 
                             function redimensionaCanvas() {
@@ -59,8 +61,6 @@
                             }
 
                             redimensionaCanvas();
-
-                            $('#unidad').click(meterCubo);
 
                         });
 
@@ -73,6 +73,16 @@
                         var layer = new Kinetic.Layer();
 
                         var offsetX = 0;
+
+                        function limpiarCanvas() {
+
+                            layer.clear();
+                            stage.clear();
+                            layer = new Kinetic.Layer();
+                            offsetX = 0;
+
+                        }
+
                         function meterCubo() {
                             var img = new Image();
                             img.onload = function() {
@@ -84,7 +94,7 @@
                                     height: 100,
                                     draggable: true
                                 });
-                                
+
                                 layer.add(cubo);
 
                                 stage.add(layer);
@@ -92,15 +102,14 @@
                                 //contexto.drawImage(img, offsetX, 0); // Or at whatever offset you like
                             };
 
-
-
                             img.src = "/Didactica/img/cubo.png";
                             offsetX += 30;
 
                         }
 
-
                     </script>
+
+
                 </section>
 
 
