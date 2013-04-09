@@ -15,7 +15,8 @@
 
         <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
 
-        <script language="javascript" src="http://code.jquery.com/jquery-1.4.2.js" ></script>
+        <script src="http://code.jquery.com/jquery-1.4.2.js" ></script>
+        
 
     </head>
     <body>
@@ -40,77 +41,13 @@
             <div class="main wrapper clearfix">
 
                 <section>
-					<div id="container" style="border: 1px solid black"></div>
-                    <button id="limpiar" onclick="limpiarCanvas()">Limpiar</button>
-                    <button id="unidad" onclick="meterCubo()">Unidad</button>
-					<script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.4.1.min.js"></script>
-                    <script defer="defer">
-
-                        var container;
-						
-						var stage = new Kinetic.Stage({
-                            container: 'container',
-                            width: 400,
-                            height: 300
-                        });
-						
-						
-                        $(document).ready(function() {
-                            container = $('#container');
-                            var padre = $(container).parent();
-
-                            $(window).resize(redimensionaCanvas);
-
-                            function redimensionaCanvas() {
-                                container.attr('width', $(padre).width());
-								stage.setWidth($(padre).width());
-								alert("no redimensiones");
-                            }
-
-                            redimensionaCanvas();
-
-                        });
-
-                        
-
-                        var layer = new Kinetic.Layer();
-
-                        var offsetX = 0;
-
-                        function limpiarCanvas() {
-
-                            layer.clear();
-                            stage.clear();
-                            layer = new Kinetic.Layer();
-                            offsetX = 0;
-
-                        }
-
-                        function meterCubo() {
-                            var img = new Image();
-                            img.onload = function() {
-                                var cubo = new Kinetic.Image({
-                                    x: offsetX,
-                                    y: 0,
-                                    image: img,
-                                    width: 54,
-                                    height: 55,
-                                    draggable: true
-                                });
-
-                                layer.add(cubo);
-
-                                stage.add(layer);
-
-                                //contexto.drawImage(img, offsetX, 0); // Or at whatever offset you like
-                            };
-
-                            img.src = "img/cubo.png";
-                            offsetX += 30;
-
-                        }
-
+					<div id="container"></div>
+                    <script>
+                    	var canvas = document.getElementById('container');
+                    	canvas.onselectstart = function() { return false; }
                     </script>
+					<script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v4.4.1.min.js"></script>
+                    <script src="js/ejercicios/1_bloquesmultibase.js" defer="defer"></script>
 
 
                 </section>
