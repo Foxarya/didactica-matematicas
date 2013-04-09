@@ -16,6 +16,7 @@
         <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
 
         <script language="javascript" src="http://code.jquery.com/jquery-1.4.2.js" ></script>
+        <script src="js/libs/kineticjs-4.3.1/kinetic.min.js"></script>
 
     </head>
     <body>
@@ -32,37 +33,76 @@
                         <li><a href="#">Info</a></li>
                     </ul>
                 </nav>
-                <script>
 
-                    var c = document.getElementById('miCanvas');
-                    var con = c.getContext('2d');
-
-                    var offset = 0;
-                    
-                    
-                    
-                    
-                    function meterCubo() {
-                        var img = new Image();
-                        img.onload = function() {
-                            con.drawImage(img, offset, 0); // Or at whatever offset you like
-                        };
-                        img.src = "/Didactica/img/cubo.jpg";
-                        
-                    }
-                    
-                </script>
             </header>
         </div>
 
         <div class="main-container">
             <div class="main wrapper clearfix">
 
-                <section>
-                    <button id="unidad" onclick="meterCubo()">Unidad</button>
-                    <canvas id="miCanvas" width="700" height="480" style="border: 1px solid black">Tu navegador no soporta canvas</canvas>
+                <section id="container">
+                    <button id="unidad">Unidad</button>
+                    <!--<canvas id="miCanvas" width="100" height="400" style="border: 1px solid black">Tu navegador no soporta canvas</canvas>-->
+                    <script defer="defer">
+
+                        var container;
+
+                        $(document).ready(function() {
+                            container = $('#container');
+                            var padre = $(container).parent();
+                            
+                            $(window).resize(redimensionaCanvas);
+
+                            function redimensionaCanvas() {
+                                container.attr('width', $(padre).width());
+                                //canvas.attr('height', $(container).height());
+                            }
+
+                            redimensionaCanvas();
+
+                            $('#unidad').click(meterCubo);
+
+                        });
+
+                        var stage = new Kinetic.Stage({
+                            container: 'container',
+                            width: $(container).width(),
+                            height: 300
+                        });
+
+                        var layer = new Kinetic.Layer();
+
+                        var offsetX = 0;
+                        function meterCubo() {
+                            var img = new Image();
+                            img.onload = function() {
+                                var cubo = new Kinetic.Image({
+                                    x: offsetX,
+                                    y: 0,
+                                    image: img,
+                                    width: 100,
+                                    height: 100,
+                                    draggable: true
+                                });
+                                
+                                layer.add(cubo);
+
+                                stage.add(layer);
+
+                                //contexto.drawImage(img, offsetX, 0); // Or at whatever offset you like
+                            };
+
+
+
+                            img.src = "/Didactica/img/cubo.png";
+                            offsetX += 30;
+
+                        }
+
+
+                    </script>
                 </section>
-                
+
 
             </div> <!-- #main -->
         </div> <!-- #main-container -->
@@ -79,12 +119,12 @@
         <script src="js/main.js"></script>
 
         <script>
-                    var _gaq = [['_setAccount', 'UA-XXXXX-X'], ['_trackPageview']];
-                    (function(d, t) {
-                        var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
-                        g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
-                        s.parentNode.insertBefore(g, s)
-                    }(document, 'script'));
+                        var _gaq = [['_setAccount', 'UA-XXXXX-X'], ['_trackPageview']];
+                        (function(d, t) {
+                            var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
+                            g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+                            s.parentNode.insertBefore(g, s)
+                        }(document, 'script'));
         </script>
     </body>
 </html>
