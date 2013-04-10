@@ -19,7 +19,7 @@ var imgCubo = new Image();
 function dibujarCubo(img) {
 	var cubo = new Kinetic.Image({
 		x : offsetX,
-		y : 50,
+		y : 70,
 		image : img,
 		width : 54,
 		height : 55,
@@ -270,9 +270,6 @@ $(document).ready(function() {
 		capaCubos.removeChildren();
 		offsetX = 0;
 	});
-
-
-	capaBotones.add(botonUnidades);
 
 	capaBotones.add(botonLimpiar);
 	capaBotones.add(textoLimpiar);
