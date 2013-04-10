@@ -6,7 +6,7 @@ var padre;
 
 var escenario = new Kinetic.Stage({
 	container : 'container',
-	width : 400,
+	width : 500,
 	height : 300
 });
 
@@ -31,16 +31,34 @@ $(document).ready(function() {
 
 	redimensionaCanvas();
 
-	var botonUnidades = new Kinetic.Rect({
-		x : 0,
-		y : 0,
-		width : 100,
-		height : 50,
-		fill : 'green',
-		stroke : 'black',
-		strokeWidth : 4
+	var textoCubo = new Kinetic.Text({
+		x : 105,
+		y : 5,
+		text : 'CUBO',
+		fontSize : 12,
+		fontFamily : 'Calibri',
+		fill : '#555',
+		width : 95,
+		padding : 20,
+		align : 'center'
 	});
-	botonUnidades.on('click', function() {
+
+	var botonCubo = new Kinetic.Rect({
+		x :105,
+		y : 5,
+		stroke : '#555',
+		strokeWidth : 5,
+		fill : '#ddd',
+		width : 95,
+		height : textoCubo.getHeight(),
+		shadowColor : 'black',
+		shadowBlur : 10,
+		shadowOffset : [10, 10],
+		shadowOpacity : 0.2,
+		cornerRadius : 10
+	});
+
+	textoCubo.on('click', function() {
 		var img = new Image();
 		img.onload = function() {
 			var cubo = new Kinetic.Image({
@@ -61,24 +79,201 @@ $(document).ready(function() {
 		offsetX += 30;
 	});
 	
-	var botonLimpiar = new Kinetic.Rect({
-		x: 60,
-		y: 0,
-		width: 100,
-		height: 50,
-		fill: 'blue',
-		stroke: 'black',
-		strokeWidth: 4
+	var textoBarras = new Kinetic.Text({
+		x : 205,
+		y : 5,
+		text : 'BARRA',
+		fontSize : 12,
+		fontFamily : 'Calibri',
+		fill : '#555',
+		width : 95,
+		padding : 20,
+		align : 'center'
 	});
-	botonLimpiar.on('click', function() {
+
+	var botonBarras = new Kinetic.Rect({
+		x :205,
+		y : 5,
+		stroke : '#555',
+		strokeWidth : 5,
+		fill : '#ddd',
+		width : 95,
+		height : textoBarras.getHeight(),
+		shadowColor : 'black',
+		shadowBlur : 10,
+		shadowOffset : [10, 10],
+		shadowOpacity : 0.2,
+		cornerRadius : 10
+	});
+	
+	textoBarras.on('click', function() {
+		var img = new Image();
+		img.onload = function() {
+			var cubo = new Kinetic.Image({
+				x : offsetX,
+				y : 50,
+				image : img,
+				width : 54,
+				height : 55,
+				draggable : true
+			});
+
+			capaCubos.add(cubo);
+
+		};
+		//
+		capaCubos.draw();
+		img.src = "/didactica-matematicas/public_html/img/cubo.png";
+		offsetX += 30;
+	});
+	
+	var textoPlacas = new Kinetic.Text({
+		x : 305,
+		y : 5,
+		text : 'PLACA',
+		fontSize : 12,
+		fontFamily : 'Calibri',
+		fill : '#555',
+		width : 95,
+		padding : 20,
+		align : 'center'
+	});
+
+	var botonPlacas = new Kinetic.Rect({
+		x :305,
+		y : 5,
+		stroke : '#555',
+		strokeWidth : 5,
+		fill : '#ddd',
+		width : 95,
+		height : textoPlacas.getHeight(),
+		shadowColor : 'black',
+		shadowBlur : 10,
+		shadowOffset : [10, 10],
+		shadowOpacity : 0.2,
+		cornerRadius : 10
+	});
+	
+	textoPlacas.on('click', function() {
+		var img = new Image();
+		img.onload = function() {
+			var cubo = new Kinetic.Image({
+				x : offsetX,
+				y : 50,
+				image : img,
+				width : 54,
+				height : 55,
+				draggable : true
+			});
+
+			capaCubos.add(cubo);
+
+		};
+		//
+		capaCubos.draw();
+		img.src = "/didactica-matematicas/public_html/img/cubo.png";
+		offsetX += 30;
+	});
+	
+	var textoBloques = new Kinetic.Text({
+		x : 405,
+		y : 5,
+		text : 'BLOQUE',
+		fontSize : 12,
+		fontFamily : 'Calibri',
+		fill : '#555',
+		width : 95,
+		padding : 20,
+		align : 'center'
+	});
+
+	var botonBloques = new Kinetic.Rect({
+		x :405,
+		y : 5,
+		stroke : '#555',
+		strokeWidth : 5,
+		fill : '#ddd',
+		width : 95,
+		height : textoBloques.getHeight(),
+		shadowColor : 'black',
+		shadowBlur : 10,
+		shadowOffset : [10, 10],
+		shadowOpacity : 0.2,
+		cornerRadius : 10
+	});
+	
+	textoBloques.on('click', function() {
+		var img = new Image();
+		img.onload = function() {
+			var cubo = new Kinetic.Image({
+				x : offsetX,
+				y : 50,
+				image : img,
+				width : 54,
+				height : 55,
+				draggable : true
+			});
+
+			capaCubos.add(cubo);
+
+		};
+		//
+		capaCubos.draw();
+		img.src = "/didactica-matematicas/public_html/img/cubo.png";
+		offsetX += 30;
+	});
+	
+	
+	
+	var textoLimpiar = new Kinetic.Text({
+		x : 5,
+		y : 5,
+		text : 'LIMPIAR',
+		fontSize : 12,
+		fontFamily : 'Calibri',
+		fill : '#555',
+		width : 95,
+		padding : 20,
+		align : 'center'
+	});
+
+	var botonLimpiar = new Kinetic.Rect({
+		x : 5,
+		y : 5,
+		stroke : '#555',
+		strokeWidth : 5,
+		fill : '#ddd',
+		width : 95,
+		height : textoLimpiar.getHeight(),
+		shadowColor : 'black',
+		shadowBlur : 10,
+		shadowOffset : [10, 10],
+		shadowOpacity : 0.2,
+		cornerRadius : 10
+	});
+
+	textoLimpiar.on('click', function() {
 		capaCubos.remove();
 		capaCubos = new Kinetic.Layer();
 		escenario.add(capaCubos);
 		offsetX = 0;
 	});
-	
-	capaBotones.add(botonUnidades);
+
 	capaBotones.add(botonLimpiar);
+	capaBotones.add(textoLimpiar);
+
+	capaBotones.add(botonCubo);
+	capaBotones.add(textoCubo);
+	
+	capaBotones.add(botonBarras);
+	capaBotones.add(textoBarras);
+	
+	capaBotones.add(botonPlacas);
+	capaBotones.add(textoPlacas);
+	
+	capaBotones.add(botonBloques);
+	capaBotones.add(textoBloques);
+
 	capaBotones.draw();
 
 });
