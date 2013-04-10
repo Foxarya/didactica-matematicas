@@ -25,14 +25,14 @@ function dibujarCubo(img) {
 		height : 55,
 		draggable : true
 	});
-	
+
 	cubo.on('mouseover', function() {
 		document.body.style.cursor = 'pointer';
 	});
 	cubo.on('mouseout', function() {
 		document.body.style.cursor = 'default';
 	});
-	
+
 	capaCubos.add(cubo);
 	offsetX += 30;
 }
@@ -63,10 +63,11 @@ $(document).ready(function() {
 		width : 95,
 		padding : 20,
 		align : 'center'
+
 	});
 
 	var botonCubo = new Kinetic.Rect({
-		x :105,
+		x : 105,
 		y : 5,
 		stroke : '#555',
 		strokeWidth : 5,
@@ -78,20 +79,30 @@ $(document).ready(function() {
 		shadowOffset : [10, 10],
 		shadowOpacity : 0.2,
 		cornerRadius : 10
+
 	});
 
 	textoCubo.on('click', function() {
-		
+
 		var img = new Image();
 		img.onload = function() {
 			dibujarCubo(img);
+
 		};
-		
+
 		img.src = "/didactica-matematicas/public_html/img/cubo.png";
-		
+
 		capaCubos.draw();
+
 	});
-	
+
+	textoCubo.on('mouseover', function() {
+		document.body.style.cursor = 'pointer';
+	});
+	textoCubo.on('mouseout', function() {
+		document.body.style.cursor = 'default';
+	});
+
 	var textoBarras = new Kinetic.Text({
 		x : 205,
 		y : 5,
@@ -105,7 +116,7 @@ $(document).ready(function() {
 	});
 
 	var botonBarras = new Kinetic.Rect({
-		x :205,
+		x : 205,
 		y : 5,
 		stroke : '#555',
 		strokeWidth : 5,
@@ -118,18 +129,31 @@ $(document).ready(function() {
 		shadowOpacity : 0.2,
 		cornerRadius : 10
 	});
-	
+
 	textoBarras.on('click', function() {
 		var img = new Image();
 		img.onload = function() {
 			dibujarCubo(img);
+
+			textoBarras.on('mouseover', function() {
+				document.body.style.cursor = 'pointer';
+			});
+			textoBarras.on('mouseout', function() {
+				document.body.style.cursor = 'default';
+			});
 		};
-		
+
 		img.src = "/didactica-matematicas/public_html/img/cubo.png";
-		
+
 		capaCubos.draw();
-		
-		
+
+	});
+
+	textoBarras.on('mouseover', function() {
+		document.body.style.cursor = 'pointer';
+	});
+	textoBarras.on('mouseout', function() {
+		document.body.style.cursor = 'default';
 	});
 
 	var textoPlacas = new Kinetic.Text({
@@ -145,7 +169,7 @@ $(document).ready(function() {
 	});
 
 	var botonPlacas = new Kinetic.Rect({
-		x :305,
+		x : 305,
 		y : 5,
 		stroke : '#555',
 		strokeWidth : 5,
@@ -158,18 +182,26 @@ $(document).ready(function() {
 		shadowOpacity : 0.2,
 		cornerRadius : 10
 	});
-	
+
 	textoPlacas.on('click', function() {
 		var img = new Image();
 		img.onload = function() {
 			dibujarCubo(img);
+
 		};
-		
+
 		img.src = "/didactica-matematicas/public_html/img/cubo.png";
-		
+
 		capaCubos.draw();
 	});
-	
+
+	textoPlacas.on('mouseover', function() {
+		document.body.style.cursor = 'pointer';
+	});
+	textoPlacas.on('mouseout', function() {
+		document.body.style.cursor = 'default';
+	});
+
 	var textoBloques = new Kinetic.Text({
 		x : 405,
 		y : 5,
@@ -183,7 +215,7 @@ $(document).ready(function() {
 	});
 
 	var botonBloques = new Kinetic.Rect({
-		x :405,
+		x : 405,
 		y : 5,
 		stroke : '#555',
 		strokeWidth : 5,
@@ -196,20 +228,26 @@ $(document).ready(function() {
 		shadowOpacity : 0.2,
 		cornerRadius : 10
 	});
-	
+
 	textoBloques.on('click', function() {
 		var img = new Image();
 		img.onload = function() {
 			dibujarCubo(img);
+
 		};
-		
+
 		img.src = "/didactica-matematicas/public_html/img/cubo.png";
-		
+
 		capaCubos.draw();
 	});
-	
-	
-	
+
+	textoBloques.on('mouseover', function() {
+		document.body.style.cursor = 'pointer';
+	});
+	textoBloques.on('mouseout', function() {
+		document.body.style.cursor = 'default';
+	});
+
 	var textoLimpiar = new Kinetic.Text({
 		x : 5,
 		y : 5,
@@ -241,19 +279,26 @@ $(document).ready(function() {
 		capaCubos.removeChildren();
 		offsetX = 0;
 	});
+	
+	textoLimpiar.on('mouseover', function() {
+		document.body.style.cursor = 'pointer';
+	});
+	textoLimpiar.on('mouseout', function() {
+		document.body.style.cursor = 'default';
+	});
 
 	capaBotones.add(botonLimpiar);
 	capaBotones.add(textoLimpiar);
 
 	capaBotones.add(botonCubo);
 	capaBotones.add(textoCubo);
-	
+
 	capaBotones.add(botonBarras);
 	capaBotones.add(textoBarras);
-	
+
 	capaBotones.add(botonPlacas);
 	capaBotones.add(textoPlacas);
-	
+
 	capaBotones.add(botonBloques);
 	capaBotones.add(textoBloques);
 
