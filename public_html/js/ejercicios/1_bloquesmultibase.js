@@ -141,19 +141,6 @@ $(document).ready(function() {
 		
 	});
 
-	var botonLimpiar = new Kinetic.Rect({
-		x : 60,
-		y : 0,
-		width : 100,
-		height : 50,
-		fill : 'blue',
-		stroke : 'black',
-		strokeWidth : 4
-	});
-	botonLimpiar.on('click', function() {
-		capaCubos.removeChildren();
-	});
-	
 	var textoPlacas = new Kinetic.Text({
 		x : 305,
 		y : 5,
@@ -280,9 +267,7 @@ $(document).ready(function() {
 	});
 
 	textoLimpiar.on('click', function() {
-		capaCubos.remove();
-		capaCubos = new Kinetic.Layer();
-		escenario.add(capaCubos);
+		capaCubos.removeChildren();
 		offsetX = 0;
 	});
 
