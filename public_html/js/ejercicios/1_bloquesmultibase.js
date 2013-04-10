@@ -152,6 +152,7 @@ $(document).ready(function() {
 	});
 	botonLimpiar.on('click', function() {
 		capaCubos.removeChildren();
+	});
 	
 	var textoPlacas = new Kinetic.Text({
 		x : 305,
