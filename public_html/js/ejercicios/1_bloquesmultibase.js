@@ -16,7 +16,9 @@ var capaCubos = new Kinetic.Layer();
 var offsetX = 0;
 var imgCubo = new Image();
 
-function dibujarCubo(img) {
+var base = 5;
+
+function dibujarCubo(img, offsetX) {
 	var cubo = new Kinetic.Image({
 		x : offsetX,
 		y : 70,
@@ -33,8 +35,22 @@ function dibujarCubo(img) {
 		document.body.style.cursor = 'default';
 	});
 	
-	capaCubos.add(cubo);
 	offsetX += 30;
+	return cubo;
+	
+}
+
+function dibujarBarra() {
+	var grupo = Kinetic.Group({
+		draggable: true
+	});
+	
+	for(int i = 0; i < base; i++)
+	{
+		(function() {
+			
+		})();
+	}
 }
 
 
