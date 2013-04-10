@@ -10,13 +10,16 @@ var escenario = new Kinetic.Stage({
 	height : 300
 });
 
+
 var capaBotones = new Kinetic.Layer();
 var capaCubos = new Kinetic.Layer();
 
 var offsetX = 0;
 var imgCubo = new Image();
 
-function dibujarCubo(img) {
+var base = 2;
+
+function dibujarCubo(img, offsetX) {
 	var cubo = new Kinetic.Image({
 		x : offsetX,
 		y : 65,
@@ -32,15 +35,177 @@ function dibujarCubo(img) {
 	cubo.on('mouseout', function() {
 		document.body.style.cursor = 'default';
 	});
+	cubo.on('dragstart', function() {
+		cubo.moveToTop();
+		capaCubos.draw();
+	});
 
-	capaCubos.add(cubo);
 	offsetX += 30;
+	capaCubos.add(cubo);
+
+}
+
+function dibujarBarra() {
+	var grupo = new Kinetic.Group({
+		draggable : true
+	});
+
+	var img = new Image();
+
+	img.onload = function() {
+		for (var i = 0; i < base; i++) {
+
+			(function() {
+				var n = i;
+				var cubo;
+				cubo = new Kinetic.Image({
+					x : n * 30,
+					y : 85,
+					image : img,
+					name : n,
+					width : 54,
+					height : 55
+				});
+
+				grupo.add(cubo);
+				//cubo.moveToTop();
+			})();
+		}
+	}
+	img.src = "/didactica-matematicas/public_html/img/cubo.png";
+
+	grupo.on('mouseover', function() {
+		document.body.style.cursor = 'pointer';
+	});
+	grupo.on('mouseout', function() {
+		document.body.style.cursor = 'default';
+	});
+	grupo.on('dragstart', function() {
+		grupo.moveToTop();
+		capaCubos.draw();
+	});
+
+	capaCubos.add(grupo);
+}
+
+function dibujarPlaca() {
+	var grupoPlaca = new Kinetic.Group({
+		x : offsetX,
+		y : 70,
+		draggable : true
+	});
+
+	var img = new Image();
+
+	img.onload = function() {
+		for (var i = 0; i < base; i++) {
+			var grupoBarra = new Kinetic.Group();
+			for (var j = 0; j < base; j++) {
+
+				(function() {
+					var n = i;
+					var h = j;
+					var cubo;
+					cubo = new Kinetic.Image({
+						x : h * 30,
+						y : n * 30,
+						image : img,
+						name : n,
+						width : 54,
+						height : 55
+					});
+
+					grupoBarra.add(cubo);
+					//cubo.moveToBottom();
+				})();
+			}
+
+			grupoPlaca.add(grupoBarra);
+			grupoBarra.moveToBottom();
+		}
+	}
+	img.src = "/didactica-matematicas/public_html/img/cubo.png";
+
+	grupoPlaca.on('mouseover', function() {
+		document.body.style.cursor = 'pointer';
+	});
+	grupoPlaca.on('mouseout', function() {
+		document.body.style.cursor = 'default';
+	});
+
+	grupoPlaca.on('dragstart', function() {
+		grupoPlaca.moveToTop();
+		capaCubos.draw();
+	});
+
+	capaCubos.add(grupoPlaca);
+}
+
+function dibujarBloque() {
+	var grupoBloque = new Kinetic.Group({
+		x : offsetX,
+		y : 70,
+		draggable : true
+	});
+
+	var img = new Image();
+
+	img.onload = function() {
+		for (var b = 0; b < base; b++) {
+			var grupoPlaca = new Kinetic.Group({
+				x: b * 16,
+				y: -(b * 16)
+			});
+			for (var i = 0; i < base; i++) {
+				var grupoBarra = new Kinetic.Group();
+				for (var j = 0; j < base; j++) {
+					(function() {
+						var n = i;
+						var h = j;
+						var cubo;
+						cubo = new Kinetic.Image({
+							x : h * 30,
+							y : n * 30,
+							image : img,
+							name : n,
+							width : 54,
+							height : 55
+						});
+
+						grupoBarra.add(cubo);
+						//cubo.moveToBottom();
+					})();
+				}
+
+				grupoPlaca.add(grupoBarra);
+				grupoBarra.moveToBottom();
+			}
+			grupoBloque.add(grupoPlaca);
+			grupoPlaca.moveToBottom();
+		}
+	}
+	img.src = "/didactica-matematicas/public_html/img/cubo.png";
+
+	grupoBloque.on('mouseover', function() {
+		document.body.style.cursor = 'pointer';
+	});
+	grupoBloque.on('mouseout', function() {
+		document.body.style.cursor = 'default';
+	});
+
+	grupoBloque.on('dragstart', function() {
+		grupoBloque.moveToTop();
+		capaCubos.draw();
+	});
+
+	capaCubos.add(grupoBloque);
 }
 
 
 $(document).ready(function() {
 	container = $('#container');
 	padre = $(container).parent();
+	anchoOriginal = $(padre).width();
 	escenario.add(capaCubos);
 	escenario.add(capaBotones);
 
@@ -49,6 +214,7 @@ $(document).ready(function() {
 	function redimensionaCanvas() {
 		container.attr('width', $(padre).width());
 		escenario.setWidth($(padre).width());
+		escenario.setScale($(padre).width() / 1026, $(padre).width() / 1026);
 	}
 
 	redimensionaCanvas();
@@ -63,7 +229,6 @@ $(document).ready(function() {
 		width : 95,
 		padding : 20,
 		align : 'center'
-
 	});
 
 	var botonCubo = new Kinetic.Rect({
@@ -79,7 +244,6 @@ $(document).ready(function() {
 		shadowOffset : [10, 10],
 		shadowOpacity : 0.2,
 		cornerRadius : 10
-
 	});
 
 	textoCubo.on('click', function() {
@@ -87,20 +251,11 @@ $(document).ready(function() {
 		var img = new Image();
 		img.onload = function() {
 			dibujarCubo(img);
-
 		};
 
 		img.src = "/didactica-matematicas/public_html/img/cubo.png";
 
 		capaCubos.draw();
-
-	});
-
-	textoCubo.on('mouseover', function() {
-		document.body.style.cursor = 'pointer';
-	});
-	textoCubo.on('mouseout', function() {
-		document.body.style.cursor = 'default';
 	});
 
 	var textoBarras = new Kinetic.Text({
@@ -131,29 +286,11 @@ $(document).ready(function() {
 	});
 
 	textoBarras.on('click', function() {
-		var img = new Image();
-		img.onload = function() {
-			dibujarCubo(img);
 
-			textoBarras.on('mouseover', function() {
-				document.body.style.cursor = 'pointer';
-			});
-			textoBarras.on('mouseout', function() {
-				document.body.style.cursor = 'default';
-			});
-		};
-
-		img.src = "/didactica-matematicas/public_html/img/cubo.png";
+		dibujarBarra();
 
 		capaCubos.draw();
 
-	});
-
-	textoBarras.on('mouseover', function() {
-		document.body.style.cursor = 'pointer';
-	});
-	textoBarras.on('mouseout', function() {
-		document.body.style.cursor = 'default';
 	});
 
 	var textoPlacas = new Kinetic.Text({
@@ -186,20 +323,12 @@ $(document).ready(function() {
 	textoPlacas.on('click', function() {
 		var img = new Image();
 		img.onload = function() {
-			dibujarCubo(img);
-
+			dibujarPlaca();
 		};
 
 		img.src = "/didactica-matematicas/public_html/img/cubo.png";
-
+		offsetX += 30;
 		capaCubos.draw();
-	});
-
-	textoPlacas.on('mouseover', function() {
-		document.body.style.cursor = 'pointer';
-	});
-	textoPlacas.on('mouseout', function() {
-		document.body.style.cursor = 'default';
 	});
 
 	var textoBloques = new Kinetic.Text({
@@ -232,20 +361,12 @@ $(document).ready(function() {
 	textoBloques.on('click', function() {
 		var img = new Image();
 		img.onload = function() {
-			dibujarCubo(img);
-
+			dibujarBloque();
 		};
 
 		img.src = "/didactica-matematicas/public_html/img/cubo.png";
 
 		capaCubos.draw();
-	});
-
-	textoBloques.on('mouseover', function() {
-		document.body.style.cursor = 'pointer';
-	});
-	textoBloques.on('mouseout', function() {
-		document.body.style.cursor = 'default';
 	});
 
 	var textoLimpiar = new Kinetic.Text({
@@ -279,13 +400,6 @@ $(document).ready(function() {
 		capaCubos.removeChildren();
 		offsetX = 0;
 	});
-	
-	textoLimpiar.on('mouseover', function() {
-		document.body.style.cursor = 'pointer';
-	});
-	textoLimpiar.on('mouseout', function() {
-		document.body.style.cursor = 'default';
-	});
 
 	capaBotones.add(botonLimpiar);
 	capaBotones.add(textoLimpiar);
@@ -305,4 +419,3 @@ $(document).ready(function() {
 	capaBotones.draw();
 
 });
-
