@@ -4,30 +4,34 @@ var padre;
 var escenario = new Kinetic.Stage({
 	container : 'container',
 	width : 500,
-	height : 300
+	height : 400
 });
 
 var capaBotones = new Kinetic.Layer();
 var capaCubos = new Kinetic.Layer();
 
 var offsetX = 0;
-var offsetYCubo = 0;
-var offsetYBarra = 0;
-var offsetYPlaca = 0;
-var offsetYBloque = 0;
+
+var offsetYCubo = 60;
+var offsetYBarra = 60;
+var offsetYPlaca = 60;
+var offsetYBloque = 60;
 
 var imgCubo = new Image();
+var imgBarra = new Image();
+var imgPlaca = new Image();
+var imgBloque = new Image();
 
-var base = 2;
+var base = 4;
 
 function dibujarCubo() {
 
 	var cubo = new Kinetic.Image({
 		x : 680,
-		y : 15 + offsetYCubo,
+		y : offsetYCubo,
 		image : imgCubo,
-		width : 54,
-		height : 55,
+		width : 30,
+		height : 30,
 		draggable : true
 	});
 
@@ -49,7 +53,7 @@ function dibujarCubo() {
 function dibujarBarra() {
 	var grupoBarra = new Kinetic.Group({
 		x : 480,
-		y : 15 + offsetYBarra,
+		y : offsetYBarra,
 		draggable : true
 	});
 
@@ -58,12 +62,12 @@ function dibujarBarra() {
 			var n = i;
 			var cubo;
 			cubo = new Kinetic.Image({
-				x : n * 30,
+				x : n * 17,
 				y : 0,
 				image : imgCubo,
 				name : n,
-				width : 54,
-				height : 55
+				width : 30,
+				height : 30
 			});
 
 			grupoBarra.add(cubo);
@@ -88,7 +92,7 @@ function dibujarBarra() {
 function dibujarPlaca() {
 	var grupoPlaca = new Kinetic.Group({
 		x : 280,
-		y : 15 + offsetYPlaca,
+		y : offsetYPlaca,
 		draggable : true
 	});
 
@@ -102,12 +106,12 @@ function dibujarPlaca() {
 				var h = j;
 				var cubo;
 				cubo = new Kinetic.Image({
-					x : h * 30,
-					y : n * 30,
+					x : h * 17,
+					y : n * 17,
 					image : imgCubo,
 					name : n,
-					width : 54,
-					height : 55
+					width : 30,
+					height : 30
 				});
 
 				grupoBarra.add(cubo);
@@ -137,14 +141,14 @@ function dibujarPlaca() {
 function dibujarBloque() {
 	var grupoBloque = new Kinetic.Group({
 		x : 80,
-		y : 15 + offsetYBloque,
+		y : offsetYBloque,
 		draggable : true
 	});
 
 	for (var b = 0; b < base; b++) {
 		var grupoPlaca = new Kinetic.Group({
-			x : b * 16,
-			y : -(b * 16)
+			x : b * 4,
+			y : -(b * 4)
 		});
 		for (var i = 0; i < base; i++) {
 			var grupoBarra = new Kinetic.Group();
@@ -154,12 +158,12 @@ function dibujarBloque() {
 					var h = j;
 					var cubo;
 					cubo = new Kinetic.Image({
-						x : h * 30,
-						y : n * 30,
+						x : h * 17,
+						y : n * 17,
 						image : imgCubo,
 						name : n,
-						width : 54,
-						height : 55
+						width : 30,
+						height : 30
 					});
 
 					grupoBarra.add(cubo);
@@ -209,146 +213,76 @@ $(document).ready(function() {
 
 	imgCubo.onload = function() {
 
-		var textoCubo = new Kinetic.Text({
-			x : 700,
+		var imgBotonCubo = new Kinetic.Image({
+
+			x : 740,
 			y : 5,
-			text : 'CUBO',
-			fontSize : 12,
-			fontFamily : 'Calibri',
-			fill : '#555',
-			width : 90,
-			padding : 20,
-			align : 'center'
+			image : imgCubo,
+			width : 50,
+			heigth : 50
+
 		});
 
-		var botonCubo = new Kinetic.Rect({
-			x : 700,
-			y : 5,
-			stroke : '#555',
-			strokeWidth : 5,
-			fill : '#ddd',
-			width : 90,
-			height : textoCubo.getHeight(),
-			shadowColor : 'black',
-			shadowBlur : 10,
-			shadowOffset : [10, 10],
-			shadowOpacity : 0.2,
-			cornerRadius : 10
-		});
-
-		textoCubo.on('click', function() {
+		imgBotonCubo.on('click', function() {
 
 			dibujarCubo();
-			
 
 			offsetYCubo += 50;
 			capaCubos.draw();
 
 		});
 
-		var textoBarras = new Kinetic.Text({
-			x : 500,
-			y : 5,
-			text : 'BARRA',
-			fontSize : 12,
-			fontFamily : 'Calibri',
-			fill : '#555',
-			width : 90,
-			padding : 20,
-			align : 'center'
-		});
+		
+			var imgBotonBarras = new Kinetic.Image({
 
-		var botonBarras = new Kinetic.Rect({
-			x : 500,
-			y : 5,
-			stroke : '#555',
-			strokeWidth : 5,
-			fill : '#ddd',
-			width : 90,
-			height : textoBarras.getHeight(),
-			shadowColor : 'black',
-			shadowBlur : 10,
-			shadowOffset : [10, 10],
-			shadowOpacity : 0.2,
-			cornerRadius : 10
-		});
+				x : 540,
+				y : 5,
+				image : imgBarra,
+				width : 200,
+				heigth : 50
 
-		textoBarras.on('click', function() {
+			});
+		
+		imgBotonBarras.on('click', function() {
 
 			dibujarBarra();
-			
+
 			offsetYBarra += 50;
 			capaCubos.draw();
 
 		});
 
-		var textoPlacas = new Kinetic.Text({
-			x : 300,
+		var imgBotonPlacas = new Kinetic.Image({
+
+			x : 340,
 			y : 5,
-			text : 'PLACA',
-			fontSize : 12,
-			fontFamily : 'Calibri',
-			fill : '#555',
-			width : 90,
-			padding : 20,
-			align : 'center'
+			image : imgPlaca,
+			width : 200,
+			heigth : 200
+
 		});
 
-		var botonPlacas = new Kinetic.Rect({
-			x : 300,
-			y : 5,
-			stroke : '#555',
-			strokeWidth : 5,
-			fill : '#ddd',
-			width : 90,
-			height : textoPlacas.getHeight(),
-			shadowColor : 'black',
-			shadowBlur : 10,
-			shadowOffset : [10, 10],
-			shadowOpacity : 0.2,
-			cornerRadius : 10
-		});
+		imgBotonPlacas.on('click', function() {
 
-		textoPlacas.on('click', function() {
 			dibujarPlaca();
-			
 
 			offsetYPlaca += 80;
 			capaCubos.draw();
 		});
 
-		var textoBloques = new Kinetic.Text({
-			x : 100,
+		var imgBotonBloques = new Kinetic.Image({
+			x : 140,
 			y : 5,
-			text : 'BLOQUE',
-			fontSize : 12,
-			fontFamily : 'Calibri',
-			fill : '#555',
-			width : 90,
-			padding : 20,
-			align : 'center'
+			image : imgBloque,
+			width : 300,
+			heigth : 300
+
 		});
 
-		var botonBloques = new Kinetic.Rect({
-			x : 100,
-			y : 5,
-			stroke : '#555',
-			strokeWidth : 5,
-			fill : '#ddd',
-			width : 90,
-			height : textoBloques.getHeight(),
-			shadowColor : 'black',
-			shadowBlur : 10,
-			shadowOffset : [10, 10],
-			shadowOpacity : 0.2,
-			cornerRadius : 10
-		});
+		imgBotonBloques.on('click', function() {
 
-		textoBloques.on('click', function() {
 			dibujarBloque();
-			
-
-			offsetYBloque += 150;
+			offsetYBloque += 100;
 			capaCubos.draw();
 		});
 
@@ -382,27 +316,25 @@ $(document).ready(function() {
 		textoLimpiar.on('click', function() {
 			capaCubos.removeChildren();
 			capaCubos.draw();
-			//offsetX = 0;
 		});
 
 		capaBotones.add(botonLimpiar);
 		capaBotones.add(textoLimpiar);
 
-		capaBotones.add(botonCubo);
-		capaBotones.add(textoCubo);
+		capaBotones.add(imgBotonCubo);
 
-		capaBotones.add(botonBarras);
-		capaBotones.add(textoBarras);
+		capaBotones.add(imgBotonBarras);
 
-		capaBotones.add(botonPlacas);
-		capaBotones.add(textoPlacas);
+		capaBotones.add(imgBotonPlacas);
 
-		capaBotones.add(botonBloques);
-		capaBotones.add(textoBloques);
+		capaBotones.add(imgBotonBloques);
 
 		capaBotones.draw();
 	};
 
 	imgCubo.src = "/didactica-matematicas/public_html/img/cubo.png";
+	imgBarra.src = "/didactica-matematicas/public_html/img/barra.png";
+	imgPlaca.src = "/didactica-matematicas/public_html/img/placa.png";
+	imgBloque.src = "/didactica-matematicas/public_html/img/bloque.png";
 
 });
