@@ -47,12 +47,14 @@ $(document).ready(function() {
 
 			var cubo = new Cubo(50, 50, true);
 
-			cubo.añadiraCapa();
+			capaCubos.add(cubo);
+			capaCubos.draw();
+
 		});
-		
+
 		capaBotones.add(botonCubo);
 		capaBotones.add(textoCubo);
-		
+
 		escenario.add(capaBotones);
 		escenario.add(capaCubos);
 	};
@@ -72,43 +74,59 @@ function Cubo(x, y, independiente) {
 		x : this.x,
 		y : this.y,
 		image : imgCubo,
-		width : 54,
-		height : 55,
+		width : imgCubo.width,
+		height : imgCubo.height,
 		draggable : this.independiente
 	});
-	
-	
+
+	if (independiente) {
+		this.kineticImage.on('mouseover', function() {
+			document.body.style.cursor = 'pointer';
+		});
+		this.kineticImage.on('mouseout', function() {
+			document.body.style.cursor = 'default';
+		});
+		this.kineticImage.on('dragstart', function() {
+
+			this.kineticImage.moveToTop();
+			capaCubos.draw();
+		});
+
+	}
+
+	return this.kineticImage;
+
 }
 
-Cubo.prototype.añadiraCapa = function() {
-	cubo.on('mouseover', function() {
-		document.body.style.cursor = 'pointer';
-	});
-	cubo.on('mouseout', function() {
-		document.body.style.cursor = 'default';
-	});
-	cubo.on('dragstart', function() {
-		cubo.moveToTop();
-		capaCubos.draw();
-	});
-
-	capaCubos.add(cubo);
-	capaCubos.draw();
-};
-
-function Barra(x, y, draggable)
-{
+function Cubo(x, y, independiente) {
 	this.x = x;
 	this.y = y;
-	this.draggable = draggable;
+	this.independiente = independiente;
 	this.kineticImage = new Kinetic.Image({
 		x : this.x,
 		y : this.y,
 		image : imgCubo,
-		width : 54,
-		height : 55,
-		draggable : this.draggable
+		width : imgCubo.width,
+		height : imgCubo.height,
+		draggable : this.independiente
 	});
+
+	if (independiente) {
+
+		this.kineticImage.on('mouseover', function() {
+			document.body.style.cursor = 'pointer';
+		});
+		this.kineticImage.on('mouseout', function() {
+			document.body.style.cursor = 'default';
+		});
+		var kine = this.kineticImage;
+		this.kineticImage.on('dragstart', function(kine) {
+			kine.moveToTop();
+			//capaCubos.draw();
+		}(kine));
+
+	}
+
+	return this.kineticImage;
+
 }
-
-
