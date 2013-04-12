@@ -20,7 +20,7 @@ var offsetYBloque = 60;
 var dictImg = {};
 
 
-var base = 6;
+var base = 12;
 
 function cargarImagenes() {
 
@@ -58,8 +58,8 @@ function dibujarCubo() {
 		x : 680,
 		y : offsetYCubo,
 		image : dictImg["cubo"],
-		width : 30,
-		height : 30,
+		width : dictImg["cubo"].width,
+		height : dictImg["cubo"].height,
 		draggable : true
 	});
 
@@ -79,146 +79,77 @@ function dibujarCubo() {
 }
 
 function dibujarBarra() {
-	var grupoBarra = new Kinetic.Group({
-		x : 480,
+	
+	var barra = new Kinetic.Image({
+		x : 680,
 		y : offsetYBarra,
+		image : dictImg["barra_base"+base],
+		width : dictImg["barra_base"+base].width,
+		height : dictImg["barra_base"+base].height,
 		draggable : true
 	});
 
-	for (var i = 0; i < base; i++) {
-		(function() {
-			var n = i;
-			var cubo;
-			cubo = new Kinetic.Image({
-				x : n * 17,
-				y : 0,
-				image : dictImg["cubo"],
-				name : n,
-				width : 30,
-				height : 30
-			});
-
-			grupoBarra.add(cubo);
-			//cubo.moveToTop();
-
-		})();
-	}
-	grupoBarra.on('mouseover', function() {
+	barra.on('mouseover', function() {
 		document.body.style.cursor = 'pointer';
 	});
-	grupoBarra.on('mouseout', function() {
+	barra.on('mouseout', function() {
 		document.body.style.cursor = 'default';
 	});
-	grupoBarra.on('dragstart', function() {
-		grupoBarra.moveToTop();
+	barra.on('dragstart', function() {
+		barra.moveToTop();
 		capaCubos.draw();
 	});
 
-	capaCubos.add(grupoBarra);
+	capaCubos.add(barra);
 }
 
 function dibujarPlaca() {
-	var grupoPlaca = new Kinetic.Group({
-		x : 280,
-		y : offsetYPlaca,
+	var placa = new Kinetic.Image({
+		x : 680,
+		y : offsetYCubo,
+		image : dictImg["placa_base"+base],
+		width : dictImg["placa_base"+base].width,
+		height : dictImg["placa_base"+base].height,
 		draggable : true
 	});
 
-	for (var i = 0; i < base; i++) {
-		var grupoBarra = new Kinetic.Group();
-
-		for (var j = 0; j < base; j++) {
-
-			(function() {
-				var n = i;
-				var h = j;
-				var cubo;
-				cubo = new Kinetic.Image({
-					x : h * 17,
-					y : n * 17,
-					image : dictImg["cubo"],
-					name : n,
-					width : 30,
-					height : 30
-				});
-
-				grupoBarra.add(cubo);
-
-			})();
-		}
-
-		grupoPlaca.add(grupoBarra);
-		grupoBarra.moveToBottom();
-	}
-
-	grupoPlaca.on('mouseover', function() {
+	placa.on('mouseover', function() {
 		document.body.style.cursor = 'pointer';
 	});
-	grupoPlaca.on('mouseout', function() {
+	placa.on('mouseout', function() {
 		document.body.style.cursor = 'default';
 	});
-
-	grupoPlaca.on('dragstart', function() {
-		grupoPlaca.moveToTop();
+	placa.on('dragstart', function() {
+		placa.moveToTop();
 		capaCubos.draw();
 	});
 
-	capaCubos.add(grupoPlaca);
+	capaCubos.add(placa);
 }
 
 function dibujarBloque() {
-	var grupoBloque = new Kinetic.Group({
-		x : 80,
-		y : offsetYBloque,
+	
+	var bloque = new Kinetic.Image({
+		x : 680,
+		y : offsetYCubo,
+		image : dictImg["bloque_base"+base],
+		width : dictImg["bloque_base"+base].width,
+		height : dictImg["bloque_base"+base].height,
 		draggable : true
 	});
 
-	for (var b = 0; b < base; b++) {
-		var grupoPlaca = new Kinetic.Group({
-			x : b * 4,
-			y : -(b * 4)
-		});
-		for (var i = 0; i < base; i++) {
-			var grupoBarra = new Kinetic.Group();
-			for (var j = 0; j < base; j++) {
-				(function() {
-					var n = i;
-					var h = j;
-					var cubo;
-					cubo = new Kinetic.Image({
-						x : h * 17,
-						y : n * 17,
-						image : dictImg["cubo"],
-						name : n,
-						width : 30,
-						height : 30
-					});
-
-					grupoBarra.add(cubo);
-					//cubo.moveToBottom();
-				})();
-			}
-
-			grupoPlaca.add(grupoBarra);
-			grupoBarra.moveToBottom();
-		}
-		grupoBloque.add(grupoPlaca);
-		grupoPlaca.moveToBottom();
-	}
-
-	grupoBloque.on('mouseover', function() {
+	bloque.on('mouseover', function() {
 		document.body.style.cursor = 'pointer';
 	});
-	grupoBloque.on('mouseout', function() {
+	bloque.on('mouseout', function() {
 		document.body.style.cursor = 'default';
 	});
-
-	grupoBloque.on('dragstart', function() {
-		grupoBloque.moveToTop();
+	bloque.on('dragstart', function() {
+		bloque.moveToTop();
 		capaCubos.draw();
 	});
 
-	capaCubos.add(grupoBloque);
+	capaCubos.add(bloque);
 }
 
 
