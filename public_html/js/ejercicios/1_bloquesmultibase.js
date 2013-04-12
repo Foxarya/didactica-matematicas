@@ -19,7 +19,8 @@ var offsetYBloque = 60;
 
 var dictImg = {};
 
-var base = 2;
+
+var base = 6;
 
 function cargarImagenes() {
 
@@ -28,18 +29,24 @@ function cargarImagenes() {
 		url : "/didactica-matematicas/public_html/img/ejercicios/1_bloquesmultibase/indice.xml",
 		dataType : "xml",
 		success : function(xml) {
+			var cargadas;
+			var numeroImagenes = $(xml).find('imagen').length;
 			$(xml).find('imagen').each(function() {
 				var nombreImagen = $(this).text();
 				var imagen = new Image();
 
 				imagen.onload = function() {
 					dictImg[nombreImagen] = imagen;
+					cargadas += ".";
+					if(cargadas.length == numeroImagenes)
+					{
+						logicaJuego();
+					}
 				};
 
 				imagen.src = "/didactica-matematicas/public_html/img/ejercicios/1_bloquesmultibase/" + nombreImagen + ".png";
 
 			});
-			logicaJuego();
 		}
 	});
 
