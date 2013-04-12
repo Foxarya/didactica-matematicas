@@ -180,11 +180,27 @@ function logicaJuego() {
 		y : 30,
 		image : dictImg["cubo"],
 		width : 50,
-		heigth : 50
+		heigth : 50,
+		draggable: true,
+        dragBoundFunc: function(pos) {
+          return {
+            x: this.getAbsolutePosition().x,
+            y: this.getAbsolutePosition().y
+          }
+        }
 
 	});
 
 	imgBotonCubo.on('click', function() {
+
+		dibujarCubo();
+
+		offsetYCubo += 50;
+		capaCubos.draw();
+
+	});
+	
+	imgBotonCubo.on('dragstart', function() {
 
 		dibujarCubo();
 
