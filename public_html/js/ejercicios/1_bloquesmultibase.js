@@ -22,7 +22,7 @@ var imgBarra = new Image();
 var imgPlaca = new Image();
 var imgBloque = new Image();
 
-var base = 4;
+var base = 2;
 
 function dibujarCubo() {
 
