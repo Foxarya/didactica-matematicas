@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
+<imagenes>
 <imagen>cubo</imagen> 
 <imagen>icono_barra</imagen> 
 <imagen>icono_placa</imagen> 
@@ -26,7 +27,7 @@
 <imagen>bloque_base10</imagen> 
 <imagen>bloque_base12</imagen> 
  
-
+</imagenes>
 
 
 
