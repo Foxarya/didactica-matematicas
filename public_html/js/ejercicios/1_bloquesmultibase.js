@@ -20,7 +20,7 @@ var offsetYBloque = 60;
 var dictImg = {};
 
 
-var base = 12;
+var base = 6;
 
 function cargarImagenes() {
 
@@ -106,7 +106,7 @@ function dibujarBarra() {
 function dibujarPlaca() {
 	var placa = new Kinetic.Image({
 		x : 280,
-		y : offsetYCubo,
+		y : offsetYPlaca,
 		image : dictImg["placa_base"+base],
 		width : dictImg["placa_base"+base].width,
 		height : dictImg["placa_base"+base].height,
@@ -131,7 +131,7 @@ function dibujarBloque() {
 	
 	var bloque = new Kinetic.Image({
 		x : 80,
-		y : offsetYCubo,
+		y : offsetYBloque,
 		image : dictImg["bloque_base"+base],
 		width : dictImg["bloque_base"+base].width,
 		height : dictImg["bloque_base"+base].height,
@@ -177,8 +177,8 @@ function logicaJuego() {
 	
 	var imgBotonCubo = new Kinetic.Image({
 		x : 740,
-		y : 30,
-		image : dictImg["cubo"],
+		y : 20,
+		image : dictImg["icono_cubo"],
 		width : 50,
 		heigth : 50
 
@@ -196,7 +196,7 @@ function logicaJuego() {
 	var imgBotonBarras = new Kinetic.Image({
 
 		x : 540,
-		y : 30,
+		y : 25,
 		image : dictImg["icono_barra"],
 		width : 100,
 		heigth : 100
@@ -274,6 +274,11 @@ function logicaJuego() {
 	});
 
 	textoLimpiar.on('click', function() {
+		
+		offsetYCubo = 60;
+		offsetYBarra = 60;
+		offsetYPlaca = 60;
+		offsetYBloque = 60;
 		capaCubos.removeChildren();
 		capaCubos.draw();
 	});
