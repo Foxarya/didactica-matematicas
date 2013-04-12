@@ -81,7 +81,7 @@ function dibujarCubo() {
 function dibujarBarra() {
 	
 	var barra = new Kinetic.Image({
-		x : 680,
+		x : 480,
 		y : offsetYBarra,
 		image : dictImg["barra_base"+base],
 		width : dictImg["barra_base"+base].width,
@@ -105,7 +105,7 @@ function dibujarBarra() {
 
 function dibujarPlaca() {
 	var placa = new Kinetic.Image({
-		x : 680,
+		x : 280,
 		y : offsetYCubo,
 		image : dictImg["placa_base"+base],
 		width : dictImg["placa_base"+base].width,
@@ -130,7 +130,7 @@ function dibujarPlaca() {
 function dibujarBloque() {
 	
 	var bloque = new Kinetic.Image({
-		x : 680,
+		x : 80,
 		y : offsetYCubo,
 		image : dictImg["bloque_base"+base],
 		width : dictImg["bloque_base"+base].width,
@@ -174,9 +174,10 @@ $(document).ready(function() {
 });
 
 function logicaJuego() {
+	
 	var imgBotonCubo = new Kinetic.Image({
 		x : 740,
-		y : 5,
+		y : 30,
 		image : dictImg["cubo"],
 		width : 50,
 		heigth : 50
@@ -195,10 +196,10 @@ function logicaJuego() {
 	var imgBotonBarras = new Kinetic.Image({
 
 		x : 540,
-		y : 5,
+		y : 30,
 		image : dictImg["icono_barra"],
-		width : 200,
-		heigth : 50
+		width : 100,
+		heigth : 100
 
 	});
 
@@ -214,10 +215,10 @@ function logicaJuego() {
 	var imgBotonPlacas = new Kinetic.Image({
 
 		x : 340,
-		y : 5,
+		y : 20,
 		image : dictImg["icono_placa"],
-		width : 200,
-		heigth : 200
+		width : 100,
+		heigth : 100
 
 	});
 
@@ -233,8 +234,8 @@ function logicaJuego() {
 		x : 140,
 		y : 5,
 		image : dictImg["icono_bloque"],
-		width : 300,
-		heigth : 300
+		width : 100,
+		heigth : 100
 
 	});
 
