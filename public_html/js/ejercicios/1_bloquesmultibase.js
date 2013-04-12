@@ -17,19 +17,47 @@ var offsetYBarra = 60;
 var offsetYPlaca = 60;
 var offsetYBloque = 60;
 
-var imgCubo = new Image();
-var imgBarra = new Image();
-var imgPlaca = new Image();
-var imgBloque = new Image();
+var dictImg = {};
 
-var base = 2;
+
+var base = 6;
+
+function cargarImagenes() {
+
+	$.ajax({
+		type : "GET",
+		url : "/didactica-matematicas/public_html/img/ejercicios/1_bloquesmultibase/indice.xml",
+		dataType : "xml",
+		success : function(xml) {
+			var cargadas;
+			var numeroImagenes = $(xml).find('imagen').length;
+			$(xml).find('imagen').each(function() {
+				var nombreImagen = $(this).text();
+				var imagen = new Image();
+
+				imagen.onload = function() {
+					dictImg[nombreImagen] = imagen;
+					cargadas += ".";
+					if(cargadas.length == numeroImagenes)
+					{
+						logicaJuego();
+					}
+				};
+
+				imagen.src = "/didactica-matematicas/public_html/img/ejercicios/1_bloquesmultibase/" + nombreImagen + ".png";
+
+			});
+		}
+	});
+
+}
 
 function dibujarCubo() {
 
 	var cubo = new Kinetic.Image({
 		x : 680,
 		y : offsetYCubo,
-		image : imgCubo,
+		image : dictImg["cubo"],
 		width : 30,
 		height : 30,
 		draggable : true
@@ -64,7 +92,7 @@ function dibujarBarra() {
 			cubo = new Kinetic.Image({
 				x : n * 17,
 				y : 0,
-				image : imgCubo,
+				image : dictImg["cubo"],
 				name : n,
 				width : 30,
 				height : 30
@@ -108,7 +136,7 @@ function dibujarPlaca() {
 				cubo = new Kinetic.Image({
 					x : h * 17,
 					y : n * 17,
-					image : imgCubo,
+					image : dictImg["cubo"],
 					name : n,
 					width : 30,
 					height : 30
@@ -160,7 +188,7 @@ function dibujarBloque() {
 					cubo = new Kinetic.Image({
 						x : h * 17,
 						y : n * 17,
-						image : imgCubo,
+						image : dictImg["cubo"],
 						name : n,
 						width : 30,
 						height : 30
@@ -197,7 +225,6 @@ function dibujarBloque() {
 $(document).ready(function() {
 	container = $('#container');
 	padre = $(container).parent();
-	anchoOriginal = $(padre).width();
 	escenario.add(capaCubos);
 	escenario.add(capaBotones);
 
@@ -210,131 +237,125 @@ $(document).ready(function() {
 	}
 
 	redimensionaCanvas();
-
-	imgCubo.onload = function() {
-
-		var imgBotonCubo = new Kinetic.Image({
-
-			x : 740,
-			y : 5,
-			image : imgCubo,
-			width : 50,
-			heigth : 50
-
-		});
-
-		imgBotonCubo.on('click', function() {
-
-			dibujarCubo();
-
-			offsetYCubo += 50;
-			capaCubos.draw();
-
-		});
-
-		
-			var imgBotonBarras = new Kinetic.Image({
-
-				x : 540,
-				y : 5,
-				image : imgBarra,
-				width : 200,
-				heigth : 50
-
-			});
-		
-		imgBotonBarras.on('click', function() {
-
-			dibujarBarra();
-
-			offsetYBarra += 50;
-			capaCubos.draw();
-
-		});
-
-		var imgBotonPlacas = new Kinetic.Image({
-
-			x : 340,
-			y : 5,
-			image : imgPlaca,
-			width : 200,
-			heigth : 200
-
-		});
-
-		imgBotonPlacas.on('click', function() {
-
-			dibujarPlaca();
-
-			offsetYPlaca += 80;
-			capaCubos.draw();
-		});
-
-		var imgBotonBloques = new Kinetic.Image({
-			x : 140,
-			y : 5,
-			image : imgBloque,
-			width : 300,
-			heigth : 300
-
-		});
-
-		imgBotonBloques.on('click', function() {
-
-			dibujarBloque();
-			offsetYBloque += 100;
-			capaCubos.draw();
-		});
-
-		var textoLimpiar = new Kinetic.Text({
-			x : 920,
-			y : 240,
-			text : 'LIMPIAR',
-			fontSize : 12,
-			fontFamily : 'Calibri',
-			fill : '#555',
-			width : 95,
-			padding : 20,
-			align : 'center'
-		});
-
-		var botonLimpiar = new Kinetic.Rect({
-			x : 920,
-			y : 240,
-			stroke : '#555',
-			strokeWidth : 5,
-			fill : '#ddd',
-			width : 95,
-			height : textoLimpiar.getHeight(),
-			shadowColor : 'black',
-			shadowBlur : 10,
-			shadowOffset : [10, 10],
-			shadowOpacity : 0.2,
-			cornerRadius : 10
-		});
-
-		textoLimpiar.on('click', function() {
-			capaCubos.removeChildren();
-			capaCubos.draw();
-		});
-
-		capaBotones.add(botonLimpiar);
-		capaBotones.add(textoLimpiar);
-
-		capaBotones.add(imgBotonCubo);
-
-		capaBotones.add(imgBotonBarras);
-
-		capaBotones.add(imgBotonPlacas);
-
-		capaBotones.add(imgBotonBloques);
-
-		capaBotones.draw();
-	};
-
-	imgCubo.src = "/didactica-matematicas/public_html/img/cubo.png";
-	imgBarra.src = "/didactica-matematicas/public_html/img/barra.png";
-	imgPlaca.src = "/didactica-matematicas/public_html/img/placa.png";
-	imgBloque.src = "/didactica-matematicas/public_html/img/bloque.png";
+	
+	cargarImagenes();
 
 });
+
+function logicaJuego() {
+	var imgBotonCubo = new Kinetic.Image({
+		x : 740,
+		y : 5,
+		image : dictImg["cubo"],
+		width : 50,
+		heigth : 50
+
+	});
+
+	imgBotonCubo.on('click', function() {
+
+		dibujarCubo();
+
+		offsetYCubo += 50;
+		capaCubos.draw();
+
+	});
+
+	var imgBotonBarras = new Kinetic.Image({
+
+		x : 540,
+		y : 5,
+		image : dictImg["icono_barra"],
+		width : 200,
+		heigth : 50
+
+	});
+
+	imgBotonBarras.on('click', function() {
+
+		dibujarBarra();
+
+		offsetYBarra += 50;
+		capaCubos.draw();
+
+	});
+
+	var imgBotonPlacas = new Kinetic.Image({
+
+		x : 340,
+		y : 5,
+		image : dictImg["icono_placa"],
+		width : 200,
+		heigth : 200
+
+	});
+
+	imgBotonPlacas.on('click', function() {
+
+		dibujarPlaca();
+
+		offsetYPlaca += 80;
+		capaCubos.draw();
+	});
+
+	var imgBotonBloques = new Kinetic.Image({
+		x : 140,
+		y : 5,
+		image : dictImg["icono_bloque"],
+		width : 300,
+		heigth : 300
+
+	});
+
+	imgBotonBloques.on('click', function() {
+
+		dibujarBloque();
+		offsetYBloque += 100;
+		capaCubos.draw();
+	});
+
+	var textoLimpiar = new Kinetic.Text({
+		x : 920,
+		y : 240,
+		text : 'LIMPIAR',
+		fontSize : 12,
+		fontFamily : 'Calibri',
+		fill : '#555',
+		width : 95,
+		padding : 20,
+		align : 'center'
+	});
+
+	var botonLimpiar = new Kinetic.Rect({
+		x : 920,
+		y : 240,
+		stroke : '#555',
+		strokeWidth : 5,
+		fill : '#ddd',
+		width : 95,
+		height : textoLimpiar.getHeight(),
+		shadowColor : 'black',
+		shadowBlur : 10,
+		shadowOffset : [10, 10],
+		shadowOpacity : 0.2,
+		cornerRadius : 10
+	});
+
+	textoLimpiar.on('click', function() {
+		capaCubos.removeChildren();
+		capaCubos.draw();
+	});
+
+	capaBotones.add(botonLimpiar);
+	capaBotones.add(textoLimpiar);
+
+	capaBotones.add(imgBotonCubo);
+
+	capaBotones.add(imgBotonBarras);
+
+	capaBotones.add(imgBotonPlacas);
+
+	capaBotones.add(imgBotonBloques);
+
+	capaBotones.draw();
+}
