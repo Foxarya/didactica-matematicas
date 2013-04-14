@@ -20,7 +20,7 @@ var offsetYBloque = 60;
 var dictImg = {};
 var imgCargadas;
 
-var base = 12;
+var base = 2;
 
 function cargarImagenes() {
 
@@ -315,6 +315,10 @@ function logicaJuego() {
 	});
 
 	textoLimpiar.on('click', function() {
+		offsetYCubo = 60;
+		offsetYBloque = 60;
+		offsetYPlaca = 60;
+		offsetYBarra = 60;
 		capaCubos.removeChildren();
 		capaCubos.draw();
 	});
