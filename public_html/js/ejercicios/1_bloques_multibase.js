@@ -20,7 +20,7 @@ var offsetYBloque = 60;
 var dictImg = {};
 var imgCargadas;
 
-var base = 2;
+var base = 6;
 
 function cargarImagenes() {
 
@@ -169,6 +169,67 @@ function Bloque(x, y) {
 
 }
 
+function Boton(x, y, ancho, alto, contenido, onclick, ondrag)
+{
+	
+	var boton;
+	var draggable = (ondrag != null) ? true : false;
+	
+	if(contenido instanceof Image)
+	{
+		boton = new Kinetic.Image({
+			x : x,
+			y : y,
+			image : contenido,
+			width : ancho,
+			heigth : alto,
+			draggable : draggable,
+			dragBoundFunc : function(pos) {
+				return {
+						x : this.getAbsolutePosition().x,
+						y : this.getAbsolutePosition().y
+					}
+			}
+		});
+		
+	} else {
+		boton = new Kinetic.Label({
+			x: x,
+			y: y,
+			opacity: 1,
+			width: ancho,
+			listening: true,
+			text: {
+				text: contenido,
+				fontSize : 12,
+				fontFamily : 'Calibri',
+				fill : '#555',
+				padding : 20,
+				align : 'center'
+			},
+			rect: {
+				stroke : '#555',
+				strokeWidth : 5,
+				fill : '#ddd',
+				shadowColor : 'black',
+				shadowBlur : 10,
+				shadowOffset : [10, 10],
+				shadowOpacity : 0.2,
+				cornerRadius : 10
+			}
+		});
+		
+	}
+	
+	boton.on('click', onclick);
+	
+	if(draggable)
+		boton.on('dragstart', ondrag);
+			
+	return boton;
+
+}
+
 $(document).ready(function() {
 	container = $('#container');
 	padre = $(container).parent();
@@ -191,22 +252,8 @@ $(document).ready(function() {
 
 function logicaJuego() {
 
-	var imgBotonCubo = new Kinetic.Image({
-		x : 740,
-		y : 30,
-		image : dictImg["cubo"],
-		width : 50,
-		heigth : 50,
-		draggable : true,
-		dragBoundFunc : function(pos) {
-			return {
-				x : this.getAbsolutePosition().x,
-				y : this.getAbsolutePosition().y
-			}
-		}
-	});
-
-	imgBotonCubo.on('click', function() {
+	
+	var imgBotonCubo = new Boton(740, 30, 50, 50, dictImg["icono_cubo"],function() {
 
 		var cubo = new Cubo(680, offsetYCubo);
 		
@@ -215,18 +262,18 @@ function logicaJuego() {
 		offsetYCubo += 50;
 		capaCubos.draw();
 
-	});
+	}, function() {
 
-	imgBotonCubo.on('dragstart', function() {
-
-		var cubo = new Cubo(escenario.getMousePosition().x - (dictImg["cubo"].width / 2), escenario.getMousePosition().y - (dictImg["cubo"].height / 2));
+		var cubo = new Cubo((escenario.getMousePosition().x - (dictImg["cubo"].width / 2)) / escenario.getScale().x, (escenario.getMousePosition().y - (dictImg["cubo"].height / 2)) / escenario.getScale().y);
 		
 		capaCubos.add(cubo);
 		cubo.startDrag();
 		
-		capaCubos.draw();
+		//capaCubos.draw();
 
 	});
+	
+	
 
 	var imgBotonBarras = new Kinetic.Image({
 
@@ -234,7 +281,14 @@ function logicaJuego() {
 		y : 30,
 		image : dictImg["icono_barra"],
 		width : 100,
-		heigth : 100
+		heigth : 100,
+		draggable : true,
+		dragBoundFunc : function(pos) {
+			return {
+				x : this.getAbsolutePosition().x,
+				y : this.getAbsolutePosition().y
+			}
+		}
 
 	});
 
@@ -248,13 +302,31 @@ function logicaJuego() {
 		capaCubos.draw();
 
 	});
+	
+	imgBotonBarras.on('dragstart', function() {
+
+		var barra = new Barra(escenario.getMousePosition().x - (dictImg["barra_base"+base].width / 2), escenario.getMousePosition().y - (dictImg["barra_base"+base].height / 2));
+		
+		capaCubos.add(barra);
+		barra.startDrag();
+		
+		capaCubos.draw();
+
+	});
 
 	var imgBotonPlacas = new Kinetic.Image({
 		x : 340,
 		y : 20,
 		image : dictImg["icono_placa"],
 		width : 100,
-		heigth : 100
+		heigth : 100,
+		draggable : true,
+		dragBoundFunc : function(pos) {
+			return {
+				x : this.getAbsolutePosition().x,
+				y : this.getAbsolutePosition().y
+			}
+		}
 
 	});
 
@@ -267,13 +339,31 @@ function logicaJuego() {
 		offsetYPlaca += 80;
 		capaCubos.draw();
 	});
+	
+	imgBotonPlacas.on('dragstart', function() {
+
+		var placa = new Placa(escenario.getMousePosition().x - (dictImg["placa_base"+base].width / 2), escenario.getMousePosition().y - (dictImg["placa_base"+base].height / 2));
+		
+		capaCubos.add(placa);
+		placa.startDrag();
+		
+		capaCubos.draw();
+
+	});
 
 	var imgBotonBloques = new Kinetic.Image({
 		x : 140,
 		y : 5,
 		image : dictImg["icono_bloque"],
 		width : 100,
-		heigth : 100
+		heigth : 100,
+		draggable : true,
+		dragBoundFunc : function(pos) {
+			return {
+				x : this.getAbsolutePosition().x,
+				y : this.getAbsolutePosition().y
+			}
+		}
 
 	});
 
@@ -286,45 +376,30 @@ function logicaJuego() {
 		offsetYBloque += 100;
 		capaCubos.draw();
 	});
+	
+	imgBotonBloques.on('dragstart', function() {
 
-	var textoLimpiar = new Kinetic.Text({
-		x : 920,
-		y : 240,
-		text : 'LIMPIAR',
-		fontSize : 12,
-		fontFamily : 'Calibri',
-		fill : '#555',
-		width : 95,
-		padding : 20,
-		align : 'center'
+		var bloque = new Bloque(escenario.getMousePosition().x - (dictImg["bloque_base"+base].width / 2), escenario.getMousePosition().y - (dictImg["bloque_base"+base].height / 2));
+		
+		capaCubos.add(bloque);
+		bloque.startDrag();
+		
+		capaCubos.draw();
+
 	});
 
-	var botonLimpiar = new Kinetic.Rect({
-		x : 920,
-		y : 240,
-		stroke : '#555',
-		strokeWidth : 5,
-		fill : '#ddd',
-		width : 95,
-		height : textoLimpiar.getHeight(),
-		shadowColor : 'black',
-		shadowBlur : 10,
-		shadowOffset : [10, 10],
-		shadowOpacity : 0.2,
-		cornerRadius : 10
-	});
-
-	textoLimpiar.on('click', function() {
+	var botonLimpiar = new Boton(920, 240, 95, null, 'LIMPIAR', function() {
+		
 		offsetYCubo = 60;
-		offsetYBloque = 60;
-		offsetYPlaca = 60;
 		offsetYBarra = 60;
+		offsetYPlaca = 60;
+		offsetYBloque = 60;
+		
 		capaCubos.removeChildren();
 		capaCubos.draw();
 	});
 
 	capaBotones.add(botonLimpiar);
-	capaBotones.add(textoLimpiar);
 
 	capaBotones.add(imgBotonCubo);
 
@@ -336,4 +411,3 @@ function logicaJuego() {
 
 	capaBotones.draw();
 }
-
