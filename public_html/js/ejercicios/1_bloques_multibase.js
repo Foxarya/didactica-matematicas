@@ -17,15 +17,36 @@ var escenario = new Kinetic.Stage({
 var capaBotones = new Kinetic.Layer();
 var capaCubos = new Kinetic.Layer();
 
-var offsetX = 0;
-
-var offsetYCubo = 60;
-var offsetYBarra = 60;
-var offsetYPlaca = 60;
-var offsetYBloque = 60;
+var posiciones = {
+	
+	cubo : {
+		x : 680,
+		y : 60,
+		offsetX : 0,
+		offsetY : 0
+	},
+	barra : {
+		x : 480,
+		y : 60,
+		offsetX : 0,
+		offsetY : 0
+	},
+	placa : {
+		x : 280,
+		y : 60,
+		offsetX : 0,
+		offsetY : 0
+	},
+	bloque : {
+		x : 5,
+		y : 60,
+		offsetX : 0,
+		offsetY : 0
+	}
+	
+};
 
 var dictImg = {};
-var imgCargadas;
 
 var base = 6;
 
@@ -46,7 +67,6 @@ function cargarImagenes() {
 					dictImg[nombreImagen] = imagen;
 					compruebaCargadas += ".";
 					if (compruebaCargadas.length == numeroImagenes) {
-						imgCargadas = true;
 						logicaJuego();
 					}
 				};
@@ -63,8 +83,6 @@ function Cubo(x, y) {
 
 	this.x = x;
 	this.y = y;
-	if (!imgCargadas)
-		return;
 	this.kineticImage = new Kinetic.Image({
 		x : this.x,
 		y : this.y,
@@ -262,8 +280,16 @@ $(document).ready(function() {
 		finalY: 1
 	}
 
-	escenario.on('dragstart', function(evt) {
 
+	escenario.on('dragstart', function(evt) {
+		
+		if(seleccion.rect != null)
+		{
+			seleccion.rect.destroy();
+			capaCubos.draw();
+			seleccion.rect = null;
+		}
+		
 		if (!evt.targetNode) {
 			seleccion.rect = new Kinetic.Rect({
 				x : escenario.getMousePosition().x / escenario.getScale().x,
@@ -285,6 +311,7 @@ $(document).ready(function() {
 	});
 
 	escenario.on('dragmove', function() {
+		
 		if (seleccion.rect != null) {
 			seleccion.rect.setWidth((escenario.getMousePosition().x - seleccion.rect.getX()) * escenario.getScale().x);
 			seleccion.rect.setHeight((escenario.getMousePosition().y - seleccion.rect.getY()) * escenario.getScale().y);
@@ -327,11 +354,17 @@ function logicaJuego() {
 
 	var imgBotonCubo = new Boton(866, 30, 50, 50, dictImg["icono_cubo"], function() {
 
-		var cubo = new Cubo(680, offsetYCubo);
+		var cubo = new Cubo(posiciones.cubo.x + posiciones.cubo.offsetX, posiciones.cubo.y + posiciones.cubo.offsetY);
 
 		capaCubos.add(cubo);
 
-		offsetYCubo += 50;
+		posiciones.cubo.offsetY += 50;
+		
+		if(posiciones.cubo.offsetY > escenario.getHieght()) {
+			posiciones.cubo.offsetY = 60;
+			posiciones.cubo.offsetX += 40;
+		}
+		
 		capaCubos.draw();
 
 	}, function() {
