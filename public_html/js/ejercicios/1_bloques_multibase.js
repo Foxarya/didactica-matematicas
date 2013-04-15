@@ -285,22 +285,22 @@ $(document).ready(function() {
 	});
 
 	escenario.on('dragmove', function() {
-		if (seleccion != null) {
-			seleccion.setWidth((escenario.getMousePosition().x - seleccion.getX()) * escenario.getScale().x);
-			seleccion.setHeight((escenario.getMousePosition().y - seleccion.getY()) * escenario.getScale().y);
+		if (seleccion.rect != null) {
+			seleccion.rect.setWidth((escenario.getMousePosition().x - seleccion.rect.getX()) * escenario.getScale().x);
+			seleccion.rect.setHeight((escenario.getMousePosition().y - seleccion.rect.getY()) * escenario.getScale().y);
 		}
 
 	});
 
 	escenario.on('dragend', function() {
-		if (seleccion != null) {
+		if (seleccion.rect != null) {
 			seleccion.finalX = escenario.getMousePosition().x;
 			seleccion.finalY = escenario.getMousePosition().y;
 			
 			var i = 0;
 			var seleccionados = new Array();
 			
-			for(var hijo in capaCubos.getChildren())
+			/*for(var hijo in capaCubos.getChildren())
 			{
 				if((hijo.x > seleccion.origenX && hijo.x < seleccion.finalX) &&
 					(hijo.y > seleccion.origenY && hijo.y < seleccion.finalY))
@@ -313,7 +313,7 @@ $(document).ready(function() {
 			if(contador > base)
 			{
 				
-			}
+			}*/
 			
 			seleccion.rect.destroy();
 			capaCubos.draw();
