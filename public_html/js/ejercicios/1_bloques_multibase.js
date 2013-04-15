@@ -325,7 +325,7 @@ $(document).ready(function() {
 
 function logicaJuego() {
 
-	var imgBotonCubo = new Boton(700, 30, 50, 50, dictImg["icono_cubo"], function() {
+	var imgBotonCubo = new Boton(866, 30, 50, 50, dictImg["icono_cubo"], function() {
 
 		var cubo = new Cubo(680, offsetYCubo);
 
@@ -342,7 +342,7 @@ function logicaJuego() {
 
 	});
 
-	var imgBotonBarras = new Boton(500, 30, 100, 100, dictImg["icono_barra"], function() {
+	var imgBotonBarras = new Boton(610, 30, 100, 100, dictImg["icono_barra"], function() {
 
 		var barra = new Barra(480, offsetYBarra);
 
@@ -359,7 +359,7 @@ function logicaJuego() {
 
 	});
 
-	var imgBotonPlacas = new Boton(300, 20, 100, 100, dictImg["icono_placa"], function() {
+	var imgBotonPlacas = new Boton(354, 20, 100, 100, dictImg["icono_placa"], function() {
 
 		var placa = new Placa(280, offsetYPlaca);
 
@@ -376,9 +376,9 @@ function logicaJuego() {
 
 	});
 
-	var imgBotonBloques = new Boton(100, 5, 100, 100, dictImg["icono_bloque"], function() {
+	var imgBotonBloques = new Boton(95, 5, 100, 100, dictImg["icono_bloque"], function() {
 
-		var bloque = new Bloque(80, offsetYBloque);
+		var bloque = new Bloque(5, offsetYBloque);
 
 		capaCubos.add(bloque);
 
@@ -393,7 +393,7 @@ function logicaJuego() {
 
 	});
 
-	var botonLimpiar = new Boton(900, 340, 95, null, 'LIMPIAR', function() {
+	var botonLimpiar = new Boton(950, 340, 32, 32, dictImg["icono_papelera"], function() {
 
 		offsetYCubo = 60;
 		offsetYBarra = 60;
