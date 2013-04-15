@@ -253,7 +253,7 @@ $(document).ready(function() {
 function logicaJuego() {
 
 	
-	var imgBotonCubo = new Boton(740, 30, 50, 50, dictImg["icono_cubo"],function() {
+	var imgBotonCubo = new Boton(700, 30, 50, 50, dictImg["icono_cubo"],function() {
 
 		var cubo = new Cubo(680, offsetYCubo);
 		
@@ -264,73 +264,33 @@ function logicaJuego() {
 
 	}, function() {
 
-		var cubo = new Cubo((escenario.getMousePosition().x - (dictImg["cubo"].width / 2)) / escenario.getScale().x, (escenario.getMousePosition().y - (dictImg["cubo"].height / 2)) / escenario.getScale().y);
-		
+		var cubo = new Cubo((escenario.getMousePosition().x - (dictImg["cubo"].width / 2)) / escenario.getScale().x, (escenario.getMousePosition().y - (dictImg["cubo"].height / 2)) / escenario.getScale().y);		
 		capaCubos.add(cubo);
 		cubo.startDrag();
-		
-		//capaCubos.draw();
 
-	});
-	
-	
-
-	var imgBotonBarras = new Kinetic.Image({
-
-		x : 540,
-		y : 30,
-		image : dictImg["icono_barra"],
-		width : 100,
-		heigth : 100,
-		draggable : true,
-		dragBoundFunc : function(pos) {
-			return {
-				x : this.getAbsolutePosition().x,
-				y : this.getAbsolutePosition().y
-			}
-		}
 
 	});
 
-	imgBotonBarras.on('click', function() {
 
+	var imgBotonBarras = new Boton(500, 30, 100, 100, dictImg["icono_barra"],function(){
+	
 		var barra = new Barra(480, offsetYBarra);
 		
 		capaCubos.add(barra);
 		
 		offsetYBarra += 50;
 		capaCubos.draw();
-
-	});
-	
-	imgBotonBarras.on('dragstart', function() {
-
-		var barra = new Barra(escenario.getMousePosition().x - (dictImg["barra_base"+base].width / 2), escenario.getMousePosition().y - (dictImg["barra_base"+base].height / 2));
 		
+	}, function(){
+	
+		var barra = new Barra((escenario.getMousePosition().x - (dictImg["barra_base"+base].width / 2)) / escenario.getScale().x, (escenario.getMousePosition().y - (dictImg["barra_base"+base].height / 2)) / escenario.getScale().y);
 		capaCubos.add(barra);
 		barra.startDrag();
-		
-		capaCubos.draw();
 
 	});
 
-	var imgBotonPlacas = new Kinetic.Image({
-		x : 340,
-		y : 20,
-		image : dictImg["icono_placa"],
-		width : 100,
-		heigth : 100,
-		draggable : true,
-		dragBoundFunc : function(pos) {
-			return {
-				x : this.getAbsolutePosition().x,
-				y : this.getAbsolutePosition().y
-			}
-		}
 
-	});
-
-	imgBotonPlacas.on('click', function() {
+	var imgBotonPlacas = new Boton(300, 20, 100, 100, dictImg["icono_placa"],function(){
 
 		var placa = new Placa(280, offsetYPlaca);
 		
@@ -338,57 +298,38 @@ function logicaJuego() {
 
 		offsetYPlaca += 80;
 		capaCubos.draw();
-	});
-	
-	imgBotonPlacas.on('dragstart', function() {
-
-		var placa = new Placa(escenario.getMousePosition().x - (dictImg["placa_base"+base].width / 2), escenario.getMousePosition().y - (dictImg["placa_base"+base].height / 2));
 		
+	}, function(){
+		
+		var placa = new Placa((escenario.getMousePosition().x - (dictImg["placa_base"+base].width / 2)) / escenario.getScale().x, (escenario.getMousePosition().y - (dictImg["placa_base"+base].height / 2)) / escenario.getScale().y);		
 		capaCubos.add(placa);
 		placa.startDrag();
 		
-		capaCubos.draw();
-
+		
 	});
+	
 
-	var imgBotonBloques = new Kinetic.Image({
-		x : 140,
-		y : 5,
-		image : dictImg["icono_bloque"],
-		width : 100,
-		heigth : 100,
-		draggable : true,
-		dragBoundFunc : function(pos) {
-			return {
-				x : this.getAbsolutePosition().x,
-				y : this.getAbsolutePosition().y
-			}
-		}
-
-	});
-
-	imgBotonBloques.on('click', function() {
-
+	var imgBotonBloques = new Boton(100, 5, 100, 100, dictImg["icono_bloque"],function(){
+		
 		var bloque = new Bloque(80, offsetYBloque);
 		
 		capaCubos.add(bloque);
 		
 		offsetYBloque += 100;
 		capaCubos.draw();
-	});
-	
-	imgBotonBloques.on('dragstart', function() {
-
-		var bloque = new Bloque(escenario.getMousePosition().x - (dictImg["bloque_base"+base].width / 2), escenario.getMousePosition().y - (dictImg["bloque_base"+base].height / 2));
+				
+	}, function(){
 		
+		var bloque = new Bloque((escenario.getMousePosition().x - (dictImg["bloque_base"+base].width / 2)) / escenario.getScale().x, (escenario.getMousePosition().y - (dictImg["bloque_base"+base].height / 2)) / escenario.getScale().y);		
 		capaCubos.add(bloque);
 		bloque.startDrag();
 		
-		capaCubos.draw();
-
+		
 	});
 
-	var botonLimpiar = new Boton(920, 240, 95, null, 'LIMPIAR', function() {
+	
+
+	var botonLimpiar = new Boton(900, 340, 95, null, 'LIMPIAR', function() {
 		
 		offsetYCubo = 60;
 		offsetYBarra = 60;
