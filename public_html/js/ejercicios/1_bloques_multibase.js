@@ -50,7 +50,7 @@ var prioridad = ["bloque", "placa", "barra", "cubo"];
 
 var dictImg = {};
 
-var base = 4;
+var base = 6;
 
 function posicionRaton() {
 	return {
@@ -93,9 +93,9 @@ function Elemento(x, y, tipo) {
 	this.x = x;
 	this.y = y;
 	this.tipo = tipo;
-
-	var imagen = (tipo == "cubo") ? dictImg[tipo] : dictImg[tipo + "_base" + base];
-
+	
+	var imagen = (tipo == "cubo") ? dictImg["cubo"] : dictImg[tipo+"_base"+base] 
+	
 	this.kineticImage = new Kinetic.Image({
 		x : this.x,
 		y : this.y,
@@ -191,6 +191,9 @@ $(document).ready(function() {
 	container.on("mouseout", function() {
 		if (escenario.isDragging()) {
 			escenario.stopDrag();
+			seleccion.rect.destroy();
+			capaCubos.draw();
+			seleccion.rect = null;
 		}
 	});
 
@@ -261,8 +264,8 @@ $(document).ready(function() {
 
 				var cubo = capaCubos.getChildren()[i];
 
-				if ( cubo instanceof Kinetic.Rect || cubo.getName() == "bloque_base" + base) {
-					break;
+				if ( cubo instanceof Kinetic.Rect || cubo.getName() == "bloque") {
+					continue;
 				}
 
 				var mayorX = Math.max(seleccion.origenX, seleccion.finalX);
@@ -305,15 +308,17 @@ $(document).ready(function() {
 					var cubo = seleccionados[i];
 					var tipo;
 					if (i == 0)
-						tipo = prioridad[cubo.getName()];
+						tipo = prioridad.indexOf(cubo.getName());
 
 					cubo.destroy();
 
-					if (i + 1 == seleccionados.length - (seleccionados.length % base)) {
+					if (i % base == 0) {
 						var siguiente = new Elemento(coordenadas.x, coordenadas.y, prioridad[tipo - 1]);
 
 						capaCubos.add(siguiente);
 						capaCubos.draw();
+						coordenadas.x = seleccionados[i+1].getX();
+						coordenadas.y = seleccionados[i+1].getY();
 					}
 
 				}
@@ -355,7 +360,7 @@ function logicaJuego() {
 
 	var imgBotonBarras = new Boton(610, 30, 100, 100, dictImg["icono_barra"], function() {
 
-		var barra = new Elemento(posiciones.barra.x + posiciones.barra.offsetX, posiciones.barra.y + posiciones.barra.offsetY, "barra_base"+base);
+		var barra = new Elemento(posiciones.barra.x + posiciones.barra.offsetX, posiciones.barra.y + posiciones.barra.offsetY, "barra");
 
 		capaCubos.add(barra);
 
@@ -370,7 +375,7 @@ function logicaJuego() {
 
 	}, function() {
 
-		var barra = new Elemento(posicionRaton().x - (dictImg["barra_base" + base].width / 2), posicionRaton().y - (dictImg["barra_base" + base].height / 2), "barra_base"+base);
+		var barra = new Elemento(posicionRaton().x - (dictImg["barra_base" + base].width / 2), posicionRaton().y - (dictImg["barra_base"+base].height / 2), "barra");
 		capaCubos.add(barra);
 		barra.startDrag();
 
@@ -378,7 +383,7 @@ function logicaJuego() {
 
 	var imgBotonPlacas = new Boton(354, 20, 100, 100, dictImg["icono_placa"], function() {
 
-		var placa = new Elemento(posiciones.placa.x + posiciones.placa.offsetX, posiciones.placa.y + posiciones.placa.offsetY, "placa_base"+base);
+		var placa = new Elemento(posiciones.placa.x + posiciones.placa.offsetX, posiciones.placa.y + posiciones.placa.offsetY, "placa");
 
 		capaCubos.add(placa);
 
@@ -393,7 +398,7 @@ function logicaJuego() {
 
 	}, function() {
 
-		var placa = new Elemento(posicionRaton().x - (dictImg["placa_base" + base].width / 2), posicionRaton().y - (dictImg["placa_base" + base].height / 2), "placa_base"+base);
+		var placa = new Elemento(posicionRaton().x - (dictImg["placa_base" + base].width / 2), posicionRaton().y - (dictImg["placa_base" + base].height / 2), "placa");
 		capaCubos.add(placa);
 		placa.startDrag();
 
@@ -401,7 +406,7 @@ function logicaJuego() {
 
 	var imgBotonBloques = new Boton(95, 5, 100, 100, dictImg["icono_bloque"], function() {
 
-		var bloque = new Elemento(posiciones.bloque.x + posiciones.bloque.offsetX, posiciones.bloque.y + posiciones.bloque.offsetY, "bloque_base"+base);
+		var bloque = new Elemento(posiciones.bloque.x + posiciones.bloque.offsetX, posiciones.bloque.y + posiciones.bloque.offsetY, "bloque");
 
 		capaCubos.add(bloque);
 
@@ -415,7 +420,7 @@ function logicaJuego() {
 
 	}, function() {
 
-		var bloque = new Elemento(posicionRaton().x - (dictImg["bloque_base" + base].width / 2), posicionRaton().y - (dictImg["bloque_base" + base].height / 2), "bloque_base"+base);
+		var bloque = new Elemento(posicionRaton().x - (dictImg["bloque_base" + base].width / 2), posicionRaton().y - (dictImg["bloque_base" + base].height / 2), "bloque");
 		capaCubos.add(bloque);
 		bloque.startDrag();
 
