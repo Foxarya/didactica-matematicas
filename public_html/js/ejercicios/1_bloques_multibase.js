@@ -46,9 +46,18 @@ var posiciones = {
 
 };
 
+var prioridad = ["bloque", "placa", "barra", "cubo"];
+
 var dictImg = {};
 
 var base = 6;
+
+function posicionRaton() {
+	return {
+		x : escenario.getPointerPosition().x / escenario.getScale().x,
+		y : escenario.getPointerPosition().y / escenario.getScale().y
+	}
+}
 
 function cargarImagenes() {
 
@@ -79,104 +88,22 @@ function cargarImagenes() {
 
 }
 
-function Cubo(x, y) {
+function Elemento(x, y, tipo) {
 
 	this.x = x;
 	this.y = y;
-	this.kineticImage = new Kinetic.Image({
-		x : this.x,
-		y : this.y,
-		image : dictImg["cubo"],
-		width : dictImg["cubo"].width,
-		height : dictImg["cubo"].height,
-		draggable : true
-	});
+	this.tipo = tipo;
 
-	this.kineticImage.on('mouseover', function() {
-		document.body.style.cursor = 'pointer';
-	});
-	this.kineticImage.on('mouseout', function() {
-		document.body.style.cursor = 'default';
-	});
-	var kine = this.kineticImage;
-	this.kineticImage.on('dragstart', function(kine) {
-		//kine.moveToTop();
-	}(kine));
-
-	return this.kineticImage;
-
-}
-
-function Barra(x, y) {
-
-	this.x = x;
-	this.y = y;
+	var imagen = (tipo == "cubo") ? dictImg[tipo] : dictImg[tipo + "_base" + base];
 
 	this.kineticImage = new Kinetic.Image({
 		x : this.x,
 		y : this.y,
-		image : dictImg["barra_base" + base],
-		width : dictImg["barra_base" + base].width,
-		height : dictImg["barra_base" + base].height,
-		draggable : true
-	});
-
-	this.kineticImage.on('mouseover', function() {
-		document.body.style.cursor = 'pointer';
-	});
-	this.kineticImage.on('mouseout', function() {
-		document.body.style.cursor = 'default';
-	});
-	var kine = this.kineticImage;
-	this.kineticImage.on('dragstart', function(kine) {
-		//kine.moveToTop();
-	}(kine));
-
-	return this.kineticImage;
-
-}
-
-function Placa(x, y) {
-
-	this.x = x;
-	this.y = y;
-
-	this.kineticImage = new Kinetic.Image({
-		x : this.x,
-		y : this.y,
-		image : dictImg["placa_base" + base],
-		width : dictImg["placa_base" + base].width,
-		height : dictImg["placa_base" + base].height,
-		draggable : true
-	});
-
-	this.kineticImage.on('mouseover', function() {
-		document.body.style.cursor = 'pointer';
-	});
-	this.kineticImage.on('mouseout', function() {
-		document.body.style.cursor = 'default';
-	});
-	var kine = this.kineticImage;
-	this.kineticImage.on('dragstart', function(kine) {
-		//kine.moveToTop();
-	}(kine));
-
-	return this.kineticImage;
-
-}
-
-function Bloque(x, y) {
-
-	this.x = x;
-	this.y = y;
-
-	this.kineticImage = new Kinetic.Image({
-		x : this.x,
-		y : this.y,
-		image : dictImg["bloque_base" + base],
-		width : dictImg["bloque_base" + base].width,
-		height : dictImg["bloque_base" + base].height,
-		draggable : true
+		image : imagen,
+		width : imagen.width,
+		height : imagen.height,
+		draggable : true,
+		name : tipo
 	});
 
 	this.kineticImage.on('mouseover', function() {
@@ -261,6 +188,11 @@ $(document).ready(function() {
 	escenario.add(capaBotones);
 
 	$(window).resize(redimensionaCanvas);
+	container.on("mouseout", function() {
+		if (escenario.isDragging()) {
+			escenario.stopDrag();
+		}
+	});
 
 	function redimensionaCanvas() {
 		container.attr('width', $(padre).width());
@@ -281,18 +213,17 @@ $(document).ready(function() {
 	}
 
 	escenario.on('dragstart', function(evt) {
-		
-		if(seleccion.rect != null)
-		{
+
+		if (seleccion.rect != null) {
 			seleccion.rect.destroy();
 			capaCubos.draw();
 			seleccion.rect = null;
 		}
-		
+
 		if (!evt.targetNode) {
 			seleccion.rect = new Kinetic.Rect({
-				x : escenario.getMousePosition().x / escenario.getScale().x,
-				y : escenario.getMousePosition().y / escenario.getScale().y,
+				x : posicionRaton().x,
+				y : posicionRaton().y,
 				width : 1,
 				height : 1,
 				stroke : '#000',
@@ -300,51 +231,95 @@ $(document).ready(function() {
 				fill : '#ddd',
 				opacity : 0.5
 			});
-			
+
 			seleccion.origenX = seleccion.rect.getX();
 			seleccion.origenY = seleccion.rect.getY();
-			
+
 			capaCubos.add(seleccion.rect);
 			capaCubos.draw();
 		}
 	});
 
 	escenario.on('dragmove', function() {
-		
+
 		if (seleccion.rect != null) {
-			seleccion.rect.setWidth((escenario.getMousePosition().x - seleccion.rect.getX()) * escenario.getScale().x);
-			seleccion.rect.setHeight((escenario.getMousePosition().y - seleccion.rect.getY()) * escenario.getScale().y);
+			seleccion.rect.setWidth(posicionRaton().x - seleccion.rect.getX());
+			seleccion.rect.setHeight(posicionRaton().y - seleccion.rect.getY());
 		}
 
 	});
 
 	escenario.on('dragend', function() {
 		if (seleccion.rect != null) {
-			seleccion.finalX = escenario.getMousePosition().x;
-			seleccion.finalY = escenario.getMousePosition().y;
-			
-			var seleccionados = new Array();
-			
-			for(var i = 0; i < capaCubos.getChildren().length; i++)
-			{
-				
+			seleccion.finalX = posicionRaton().x;
+			seleccion.finalY = posicionRaton().y;
+
+			var seleccionados = new Kinetic.Collection();
+			var seleccionadoElementoDistinto = false;
+
+			for (var i = 0; i < capaCubos.getChildren().length; i++) {
+
 				var cubo = capaCubos.getChildren()[i];
-				
-				if((cubo.getX() > seleccion.origenX && cubo.getX() < seleccion.finalX) &&
-					(cubo.getY() > seleccion.origenY && cubo.getY() < seleccion.finalY))
-				{
+
+				if ( cubo instanceof Kinetic.Rect || cubo.getName() == "bloque_base" + base) {
+					break;
+				}
+
+				var mayorX = Math.max(seleccion.origenX, seleccion.finalX);
+				var mayorY = Math.max(seleccion.origenY, seleccion.finalY);
+				var menorX = Math.min(seleccion.origenX, seleccion.finalX);
+				var menorY = Math.min(seleccion.origenY, seleccion.finalY);
+
+				if ((cubo.getX() > menorX && cubo.getX() + cubo.getWidth() < mayorX) && (cubo.getY() > menorY && cubo.getY() + cubo.getHeight() < mayorY)) {
 					seleccionados.push(cubo);
 					cubo.applyFilter(Kinetic.Filters.Grayscale, null, function() {
 						capaCubos.draw();
 					});
+					if (seleccionados[0].getName() != cubo.getName()) {
+						seleccionadoElementoDistinto = true;
+					}
 				}
+
 			}
-			
-			if(i > base)
-			{
-				
+
+			if (seleccionados.length >= base && !seleccionadoElementoDistinto) {
+				var coordenadas = {
+					x : seleccionados[0].getX(),
+					y : seleccionados[0].getY()
+				};
+				var offsetX = coordenadas.x;
+
+				for (var i = 0; i < seleccionados.length - (seleccionados.length % base); i++) {
+					var cubo = seleccionados[i];
+
+					cubo.transitionTo({
+						x : offsetX,
+						y : coordenadas.y,
+						duration : 1,
+						easing : 'ease-in-out'
+					});
+					offsetX += 9;
+
+				}
+				for (var i = 0; i < seleccionados.length - (seleccionados.length % base); i++) {
+					var cubo = seleccionados[i];
+					var tipo;
+					if (i == 0)
+						tipo = prioridad[cubo.getName()];
+
+					cubo.destroy();
+
+					if (i + 1 == seleccionados.length - (seleccionados.length % base)) {
+						var siguiente = new Elemento(coordenadas.x, coordenadas.y, prioridad[tipo - 1]);
+
+						capaCubos.add(siguiente);
+						capaCubos.draw();
+					}
+
+				}
+
 			}
-			
+
 			seleccion.rect.destroy();
 			capaCubos.draw();
 			seleccion.rect = null;
@@ -367,12 +342,12 @@ function logicaJuego() {
 			posiciones.cubo.offsetY = 60;
 			posiciones.cubo.offsetX += 40;
 		}
-		
+
 		capaCubos.draw();
 
 	}, function() {
 
-		var cubo = new Cubo((escenario.getMousePosition().x - (dictImg["cubo"].width / 2)) / escenario.getScale().x, (escenario.getMousePosition().y - (dictImg["cubo"].height / 2)) / escenario.getScale().y);
+		var cubo = new Cubo(posicionRaton().x - (dictImg["cubo"].width / 2), posicionRaton().y - (dictImg["cubo"].height / 2));
 		capaCubos.add(cubo);
 		cubo.startDrag();
 
@@ -395,7 +370,7 @@ function logicaJuego() {
 
 	}, function() {
 
-		var barra = new Barra((escenario.getMousePosition().x - (dictImg["barra_base" + base].width / 2)) / escenario.getScale().x, (escenario.getMousePosition().y - (dictImg["barra_base" + base].height / 2)) / escenario.getScale().y);
+		var barra = new Barra(posicionRaton().x - (dictImg["barra_base" + base].width / 2), posicionRaton().y - (dictImg["barra_base" + base].height / 2));
 		capaCubos.add(barra);
 		barra.startDrag();
 
@@ -408,17 +383,17 @@ function logicaJuego() {
 		capaCubos.add(placa);
 
 		posiciones.placa.offsetY += 80;
-		
+
 		if (posiciones.placa.offsetY > escenario.getHeight()) {
 			posiciones.placa.offsetY = 60;
 			posiciones.placa.offsetX += 40;
 		}
-		
+
 		capaCubos.draw();
 
 	}, function() {
 
-		var placa = new Placa((escenario.getMousePosition().x - (dictImg["placa_base" + base].width / 2)) / escenario.getScale().x, (escenario.getMousePosition().y - (dictImg["placa_base" + base].height / 2)) / escenario.getScale().y);
+		var placa = new Placa(posicionRaton().x - (dictImg["placa_base" + base].width / 2), posicionRaton().y - (dictImg["placa_base" + base].height / 2));
 		capaCubos.add(placa);
 		placa.startDrag();
 
@@ -431,7 +406,7 @@ function logicaJuego() {
 		capaCubos.add(bloque);
 
 		posiciones.bloque.offsetY += 100;
-		
+
 		if (posiciones.bloque.offsetY > escenario.getHeight()) {
 			posiciones.bloque.offsetY = 60;
 			posiciones.bloque.offsetX += 40;
@@ -440,7 +415,7 @@ function logicaJuego() {
 
 	}, function() {
 
-		var bloque = new Bloque((escenario.getMousePosition().x - (dictImg["bloque_base" + base].width / 2)) / escenario.getScale().x, (escenario.getMousePosition().y - (dictImg["bloque_base" + base].height / 2)) / escenario.getScale().y);
+		var bloque = new Bloque(posicionRaton().x - (dictImg["bloque_base" + base].width / 2), posicionRaton().y - (dictImg["bloque_base" + base].height / 2));
 		capaCubos.add(bloque);
 		bloque.startDrag();
 
@@ -450,7 +425,7 @@ function logicaJuego() {
 
 		posiciones.cubo.offsetX = 60;
 		posiciones.cubo.offsetY = 60;
-		
+
 		posiciones.barra.offsetX = 60;
 		posiciones.barra.offsetX = 60;
 
@@ -459,7 +434,6 @@ function logicaJuego() {
 
 		posiciones.bloque.offsetX = 60;
 		posiciones.bloque.offsetX = 60;
-
 
 		capaCubos.removeChildren();
 		capaCubos.draw();
