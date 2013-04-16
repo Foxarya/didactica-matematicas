@@ -50,7 +50,7 @@ var prioridad = ["bloque", "placa", "barra", "cubo"];
 
 var dictImg = {};
 
-var base = 6;
+var base = 4;
 
 function posicionRaton() {
 	return {
@@ -332,7 +332,7 @@ function logicaJuego() {
 
 	var imgBotonCubo = new Boton(866, 30, 50, 50, dictImg["icono_cubo"], function() {
 
-		var cubo = new Cubo(posiciones.cubo.x + posiciones.cubo.offsetX, posiciones.cubo.y + posiciones.cubo.offsetY);
+		var cubo = new Elemento(posiciones.cubo.x + posiciones.cubo.offsetX, posiciones.cubo.y + posiciones.cubo.offsetY, "cubo");
 
 		capaCubos.add(cubo);
 
@@ -347,7 +347,7 @@ function logicaJuego() {
 
 	}, function() {
 
-		var cubo = new Cubo(posicionRaton().x - (dictImg["cubo"].width / 2), posicionRaton().y - (dictImg["cubo"].height / 2));
+		var cubo = new Elemento(posicionRaton().x - (dictImg["cubo"].width / 2), posicionRaton().y - (dictImg["cubo"].height / 2), "cubo");
 		capaCubos.add(cubo);
 		cubo.startDrag();
 
@@ -355,7 +355,7 @@ function logicaJuego() {
 
 	var imgBotonBarras = new Boton(610, 30, 100, 100, dictImg["icono_barra"], function() {
 
-		var barra = new Barra(posiciones.barra.x + posiciones.barra.offsetX, posiciones.barra.y + posiciones.barra.offsetY);
+		var barra = new Elemento(posiciones.barra.x + posiciones.barra.offsetX, posiciones.barra.y + posiciones.barra.offsetY, "barra_base"+base);
 
 		capaCubos.add(barra);
 
@@ -370,7 +370,7 @@ function logicaJuego() {
 
 	}, function() {
 
-		var barra = new Barra(posicionRaton().x - (dictImg["barra_base" + base].width / 2), posicionRaton().y - (dictImg["barra_base" + base].height / 2));
+		var barra = new Elemento(posicionRaton().x - (dictImg["barra_base" + base].width / 2), posicionRaton().y - (dictImg["barra_base" + base].height / 2), "barra_base"+base);
 		capaCubos.add(barra);
 		barra.startDrag();
 
@@ -378,7 +378,7 @@ function logicaJuego() {
 
 	var imgBotonPlacas = new Boton(354, 20, 100, 100, dictImg["icono_placa"], function() {
 
-		var placa = new Placa(posiciones.placa.x + posiciones.placa.offsetX, posiciones.placa.y + posiciones.placa.offsetY);
+		var placa = new Elemento(posiciones.placa.x + posiciones.placa.offsetX, posiciones.placa.y + posiciones.placa.offsetY, "placa_base"+base);
 
 		capaCubos.add(placa);
 
@@ -393,7 +393,7 @@ function logicaJuego() {
 
 	}, function() {
 
-		var placa = new Placa(posicionRaton().x - (dictImg["placa_base" + base].width / 2), posicionRaton().y - (dictImg["placa_base" + base].height / 2));
+		var placa = new Elemento(posicionRaton().x - (dictImg["placa_base" + base].width / 2), posicionRaton().y - (dictImg["placa_base" + base].height / 2), "placa_base"+base);
 		capaCubos.add(placa);
 		placa.startDrag();
 
@@ -401,7 +401,7 @@ function logicaJuego() {
 
 	var imgBotonBloques = new Boton(95, 5, 100, 100, dictImg["icono_bloque"], function() {
 
-		var bloque = new Bloque(posiciones.bloque.x + posiciones.bloque.offsetX, posiciones.bloque.y + posiciones.bloque.offsetY);
+		var bloque = new Elemento(posiciones.bloque.x + posiciones.bloque.offsetX, posiciones.bloque.y + posiciones.bloque.offsetY, "bloque_base"+base);
 
 		capaCubos.add(bloque);
 
@@ -415,7 +415,7 @@ function logicaJuego() {
 
 	}, function() {
 
-		var bloque = new Bloque(posicionRaton().x - (dictImg["bloque_base" + base].width / 2), posicionRaton().y - (dictImg["bloque_base" + base].height / 2));
+		var bloque = new Elemento(posicionRaton().x - (dictImg["bloque_base" + base].width / 2), posicionRaton().y - (dictImg["bloque_base" + base].height / 2), "bloque_base"+base);
 		capaCubos.add(bloque);
 		bloque.startDrag();
 
