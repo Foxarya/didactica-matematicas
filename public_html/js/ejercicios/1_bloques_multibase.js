@@ -302,8 +302,8 @@ $(document).ready(function() {
 				opacity : 0.5
 			});
 			
-			seleccion.origenX = seleccion.rect.x;
-			seleccion.origenY = seleccion.rect.y;
+			seleccion.origenX = seleccion.rect.getX();
+			seleccion.origenY = seleccion.rect.getY();
 			
 			capaCubos.add(seleccion.rect);
 			capaCubos.draw();
@@ -324,23 +324,27 @@ $(document).ready(function() {
 			seleccion.finalX = escenario.getMousePosition().x;
 			seleccion.finalY = escenario.getMousePosition().y;
 			
-			var i = 0;
 			var seleccionados = new Array();
 			
-			/*for(var hijo in capaCubos.getChildren())
+			for(var i = 0; i < capaCubos.getChildren().length; i++)
 			{
-				if((hijo.x > seleccion.origenX && hijo.x < seleccion.finalX) &&
-					(hijo.y > seleccion.origenY && hijo.y < seleccion.finalY))
+				
+				var cubo = capaCubos.getChildren()[i];
+				
+				if((cubo.getX() > seleccion.origenX && cubo.getX() < seleccion.finalX) &&
+					(cubo.getY() > seleccion.origenY && cubo.getY() < seleccion.finalY))
 				{
-					i++;
-					seleccionados.push(hijo);
+					seleccionados.push(cubo);
+					cubo.applyFilter(Kinetic.Filters.Grayscale, null, function() {
+						capaCubos.draw();
+					});
 				}
 			}
 			
-			if(contador > base)
+			if(i > base)
 			{
 				
-			}*/
+			}
 			
 			seleccion.rect.destroy();
 			capaCubos.draw();
@@ -360,7 +364,7 @@ function logicaJuego() {
 
 		posiciones.cubo.offsetY += 50;
 		
-		if(posiciones.cubo.offsetY > escenario.getHieght()) {
+		if(posiciones.cubo.offsetY > escenario.getHeight()) {
 			posiciones.cubo.offsetY = 60;
 			posiciones.cubo.offsetX += 40;
 		}
