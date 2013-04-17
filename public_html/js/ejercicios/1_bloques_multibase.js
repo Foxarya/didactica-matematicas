@@ -63,7 +63,7 @@ function cargarImagenes() {
 
 	$.ajax({
 		type : "GET",
-		url : "/didactica-matematicas/public_html/img/ejercicios/1_bloquesmultibase/indice.xml",
+		url : "img/ejercicios/1_bloquesmultibase/indice.xml",
 		dataType : "xml",
 		success : function(xml) {
 			var compruebaCargadas;
@@ -80,7 +80,7 @@ function cargarImagenes() {
 					}
 				};
 
-				imagen.src = "/didactica-matematicas/public_html/img/ejercicios/1_bloquesmultibase/" + nombreImagen + ".png";
+				imagen.src = "img/ejercicios/1_bloquesmultibase/" + nombreImagen + ".png";
 
 			});
 		}
@@ -88,14 +88,64 @@ function cargarImagenes() {
 
 }
 
+function agrupar(elementos) {
+	var coordenadas = {
+		x : elementos[0].getX(),
+		y : elementos[0].getY()
+	};
+	var offsetX = coordenadas.x;
+
+	for (var i = 0; i < elementos.length - (elementos.length % base); i++) {
+		var elemento = elementos[i];
+
+		if (i + 1 == elementos.length - (elementos.length % base)) {
+			elemento.transitionTo({
+				x : coordenadas.x,
+				y : coordenadas.y,
+				duration : 1,
+				easing : 'ease-in-out',
+				callback : function() {
+					for (var i = 0; i < elementos.length - (elementos.length % base); i++) {
+						var cubo = elementos[i];
+						var tipo;
+						if (i == 0)
+							tipo = prioridad.indexOf(elemento.getName());
+
+						elemento.destroy();
+
+						if (i % base == 0) {
+							var siguiente = new Elemento(coordenadas.x, coordenadas.y, prioridad[tipo - 1]);
+
+							capaCubos.add(siguiente);
+							siguiente.draw();
+							coordenadas.x = elementos[i + 1].getX();
+							coordenadas.y = elementos[i + 1].getY();
+						}
+
+					}
+				}
+			});
+		} else {
+			elemento.transitionTo({
+				x : coordenadas.x,
+				y : coordenadas.y,
+				duration : 1,
+				easing : 'ease-in-out'
+			});
+			offsetX += 9;
+		}
+
+	}
+}
+
 function Elemento(x, y, tipo) {
 
 	this.x = x;
 	this.y = y;
 	this.tipo = tipo;
-	
-	var imagen = (tipo == "cubo") ? dictImg["cubo"] : dictImg[tipo+"_base"+base] 
-	
+
+	var imagen = (tipo == "cubo") ? dictImg["cubo"] : dictImg[tipo + "_base" + base]
+
 	this.kineticImage = new Kinetic.Image({
 		x : this.x,
 		y : this.y,
@@ -171,7 +221,7 @@ function Boton(x, y, ancho, alto, contenido, onclick, ondrag) {
 
 	}
 
-	boton.on('click', onclick);
+	boton.on('click tap', onclick);
 
 	if (draggable)
 		boton.on('dragstart', ondrag);
@@ -200,12 +250,13 @@ $(document).ready(function() {
 	function redimensionaCanvas() {
 		container.attr('width', $(padre).width());
 		escenario.setWidth($(padre).width());
+		escenario.setHeight($(padre).height());
 		escenario.setScale($(padre).width() / 1026, $(padre).width() / 1026);
 	}
 
-	redimensionaCanvas();
-
 	cargarImagenes();
+
+	redimensionaCanvas();
 
 	var seleccion = {
 		rect : null,
@@ -239,7 +290,7 @@ $(document).ready(function() {
 			seleccion.origenY = seleccion.rect.getY();
 
 			capaCubos.add(seleccion.rect);
-			capaCubos.draw();
+			seleccion.rect.draw();
 		}
 	});
 
@@ -275,54 +326,20 @@ $(document).ready(function() {
 
 				if ((cubo.getX() > menorX && cubo.getX() + cubo.getWidth() < mayorX) && (cubo.getY() > menorY && cubo.getY() + cubo.getHeight() < mayorY)) {
 					seleccionados.push(cubo);
-					cubo.applyFilter(Kinetic.Filters.Grayscale, null, function() {
-						capaCubos.draw();
-					});
+					/*cubo.applyFilter(Kinetic.Filters.Grayscale, null, function() {
+					 capaCubos.draw();
+					 });*/
 					if (seleccionados[0].getName() != cubo.getName()) {
 						seleccionadoElementoDistinto = true;
+						break;
 					}
 				}
 
 			}
 
 			if (seleccionados.length >= base && !seleccionadoElementoDistinto) {
-				var coordenadas = {
-					x : seleccionados[0].getX(),
-					y : seleccionados[0].getY()
-				};
-				var offsetX = coordenadas.x;
-
-				for (var i = 0; i < seleccionados.length - (seleccionados.length % base); i++) {
-					var cubo = seleccionados[i];
-
-					cubo.transitionTo({
-						x : offsetX,
-						y : coordenadas.y,
-						duration : 1,
-						easing : 'ease-in-out'
-					});
-					offsetX += 9;
-
-				}
-				for (var i = 0; i < seleccionados.length - (seleccionados.length % base); i++) {
-					var cubo = seleccionados[i];
-					var tipo;
-					if (i == 0)
-						tipo = prioridad.indexOf(cubo.getName());
-
-					cubo.destroy();
-
-					if (i % base == 0) {
-						var siguiente = new Elemento(coordenadas.x, coordenadas.y, prioridad[tipo - 1]);
-
-						capaCubos.add(siguiente);
-						capaCubos.draw();
-						coordenadas.x = seleccionados[i+1].getX();
-						coordenadas.y = seleccionados[i+1].getY();
-					}
-
-				}
-
+				
+				agrupar(seleccionados);
 			}
 
 			seleccion.rect.destroy();
@@ -348,7 +365,7 @@ function logicaJuego() {
 			posiciones.cubo.offsetX += 40;
 		}
 
-		capaCubos.draw();
+		cubo.draw();
 
 	}, function() {
 
@@ -371,11 +388,11 @@ function logicaJuego() {
 			posiciones.barra.offsetX += 40;
 		}
 
-		capaCubos.draw();
+		barra.draw();
 
 	}, function() {
 
-		var barra = new Elemento(posicionRaton().x - (dictImg["barra_base" + base].width / 2), posicionRaton().y - (dictImg["barra_base"+base].height / 2), "barra");
+		var barra = new Elemento(posicionRaton().x - (dictImg["barra_base" + base].width / 2), posicionRaton().y - (dictImg["barra_base" + base].height / 2), "barra");
 		capaCubos.add(barra);
 		barra.startDrag();
 
@@ -394,7 +411,7 @@ function logicaJuego() {
 			posiciones.placa.offsetX += 40;
 		}
 
-		capaCubos.draw();
+		placa.draw();
 
 	}, function() {
 
@@ -416,7 +433,7 @@ function logicaJuego() {
 			posiciones.bloque.offsetY = 60;
 			posiciones.bloque.offsetX += 40;
 		}
-		capaCubos.draw();
+		bloque.draw();
 
 	}, function() {
 
