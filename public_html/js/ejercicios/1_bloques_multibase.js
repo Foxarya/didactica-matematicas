@@ -50,7 +50,7 @@ var prioridad = ["bloque", "placa", "barra", "cubo"];
 
 var dictImg = {};
 
-var base = 2;
+var base = 4;
 
 function posicionRaton() {
 	return {
@@ -138,13 +138,13 @@ function agrupar(elementos) {
 	}
 }
 
-function Elemento(x, y, tipo) {
+function Elemento(config) {
 
-	this.x = x;
-	this.y = y;
-	this.tipo = tipo;
+	this.x = config.x;
+	this.y = config.y;
+	this.tipo = config.tipo;
 
-	var imagen = (tipo == "cubo") ? dictImg["cubo"] : dictImg[tipo + "_base" + base]
+	var imagen = (config.tipo == "cubo") ? dictImg["cubo"] : dictImg[config.tipo + "_base" + base]
 
 	this.kineticImage = new Kinetic.Image({
 		x : this.x,
@@ -153,7 +153,7 @@ function Elemento(x, y, tipo) {
 		width : imagen.width,
 		height : imagen.height,
 		draggable : true,
-		name : tipo
+		name : config.tipo
 	});
 
 	this.kineticImage.on('mouseover', function() {
@@ -171,18 +171,18 @@ function Elemento(x, y, tipo) {
 
 }
 
-function Boton(x, y, ancho, alto, contenido, onclick, ondrag) {
+function Boton(config) {
 
 	var boton;
-	var draggable = (ondrag != null) ? true : false;
+	var draggable = (config.ondrag != null) ? true : false;
 
-	if ( contenido instanceof Image) {
+	if (config.contenido instanceof Image) {
 		boton = new Kinetic.Image({
-			x : x,
-			y : y,
-			image : contenido,
-			width : ancho,
-			heigth : alto,
+			x : config.x,
+			y : config.y,
+			image : config.contenido,
+			width : config.ancho,
+			heigth : config.alto,
 			draggable : draggable,
 			dragBoundFunc : function(pos) {
 				return {
@@ -194,13 +194,13 @@ function Boton(x, y, ancho, alto, contenido, onclick, ondrag) {
 
 	} else {
 		boton = new Kinetic.Label({
-			x : x,
-			y : y,
+			x : config.x,
+			y : config.y,
 			opacity : 1,
-			width : ancho,
+			width : config.ancho,
 			listening : true,
 			text : {
-				text : contenido,
+				text : config.contenido,
 				fontSize : 12,
 				fontFamily : 'Calibri',
 				fill : '#555',
@@ -221,10 +221,10 @@ function Boton(x, y, ancho, alto, contenido, onclick, ondrag) {
 
 	}
 
-	boton.on('click tap', onclick);
+	boton.on('click tap', config.onclick);
 
 	if (draggable)
-		boton.on('dragstart', ondrag);
+		boton.on('dragstart', config.ondrag);
 
 	return boton;
 
@@ -338,7 +338,7 @@ $(document).ready(function() {
 			}
 
 			if (seleccionados.length >= base && !seleccionadoElementoDistinto) {
-				
+
 				agrupar(seleccionados);
 			}
 
@@ -352,27 +352,34 @@ $(document).ready(function() {
 
 function logicaJuego() {
 
-	var imgBotonCubo = new Boton(866, 30, 50, 50, dictImg["icono_cubo"], function() {
+	
+	var imgBotonCubo = new Boton({
+		x : 866,
+		y : 80,
+		ancho : 50,
+		alto : 50,
+		contenido : dictImg["icono_cubo"],
+		onclick : function() {
+			var cubo = new Elemento(posiciones.cubo.x + posiciones.cubo.offsetX, posiciones.cubo.y + posiciones.cubo.offsetY, "cubo");
 
-		var cubo = new Elemento(posiciones.cubo.x + posiciones.cubo.offsetX, posiciones.cubo.y + posiciones.cubo.offsetY, "cubo");
+			capaCubos.add(cubo);
 
-		capaCubos.add(cubo);
+			posiciones.cubo.offsetY += 50;
 
-		posiciones.cubo.offsetY += 50;
+			if (posiciones.cubo.offsetY > escenario.getHeight()) {
+				posiciones.cubo.offsetY = 60;
+				posiciones.cubo.offsetX += 40;
+			}
 
-		if (posiciones.cubo.offsetY > escenario.getHeight()) {
-			posiciones.cubo.offsetY = 60;
-			posiciones.cubo.offsetX += 40;
+			cubo.draw();
+		},
+		ondrag : function() {
+
+			var cubo = new Elemento(posicionRaton().x - (dictImg["cubo"].width / 2), posicionRaton().y - (dictImg["cubo"].height / 2), "cubo");
+			capaCubos.add(cubo);
+			cubo.startDrag();
+
 		}
-
-		cubo.draw();
-
-	}, function() {
-
-		var cubo = new Elemento(posicionRaton().x - (dictImg["cubo"].width / 2), posicionRaton().y - (dictImg["cubo"].height / 2), "cubo");
-		capaCubos.add(cubo);
-		cubo.startDrag();
-
 	});
 
 	var imgBotonBarras = new Boton(610, 30, 100, 100, dictImg["icono_barra"], function() {
