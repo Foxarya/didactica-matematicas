@@ -50,7 +50,7 @@ var prioridad = ["bloque", "placa", "barra", "cubo"];
 
 var dictImg = {};
 
-var base = 6;
+var base = 2;
 
 function posicionRaton() {
 	return {
@@ -106,7 +106,7 @@ function agrupar(elementos) {
 				easing : 'ease-in-out',
 				callback : function() {
 					for (var i = 0; i < elementos.length - (elementos.length % base); i++) {
-						var cubo = elementos[i];
+						var elemento = elementos[i];
 						var tipo;
 						if (i == 0)
 							tipo = prioridad.indexOf(elemento.getName());
