@@ -16,6 +16,7 @@ var escenario = new Kinetic.Stage({
 
 var capaBotones = new Kinetic.Layer();
 var capaCubos = new Kinetic.Layer();
+var capaPapelera = new Kinetic.Layer();
 
 var posiciones = {
 
@@ -61,12 +62,25 @@ function posicionRaton() {
 
 function cargarImagenes() {
 
+	var barraCarga = new Kinetic.Rect({
+		x : escenario.getWidth() / 2 - 100,
+		y : escenario.getHeight() / 2,
+		width : 0,
+		height : 5,
+		stroke : 'black',
+		strokeWidth : 2,
+		fill : 'orange'
+
+	});
+
+	capaCubos.add(barraCarga);
+
 	$.ajax({
 		type : "GET",
 		url : "img/ejercicios/1_bloquesmultibase/indice.xml",
 		dataType : "xml",
 		success : function(xml) {
-			var compruebaCargadas;
+			var cargadas = 0;
 			var numeroImagenes = $(xml).find('imagen').length;
 			$(xml).find('imagen').each(function() {
 				var nombreImagen = $(this).text();
@@ -74,8 +88,15 @@ function cargarImagenes() {
 
 				imagen.onload = function() {
 					dictImg[nombreImagen] = imagen;
-					compruebaCargadas += ".";
-					if (compruebaCargadas.length == numeroImagenes) {
+					cargadas++;
+					barraCarga.transitionTo({
+						width : cargadas * 10,
+						duration : 0.1,
+						easing: 'ease-in-out'
+					});
+					barraCarga.draw();
+					if (cargadas == numeroImagenes) {
+						barraCarga.destroy();
 						logicaJuego();
 					}
 				};
@@ -138,51 +159,119 @@ function agrupar(elementos) {
 	}
 }
 
-function Elemento(config) {
+function hayColision(elementoA, elementoB) {
 
-	this.x = config.x;
-	this.y = config.y;
-	this.tipo = config.tipo;
+	var centroB = {
+		x : elementoB.getX() + (elementoB.getWidth() / 2),
+		y : elementoB.getY() + (elementoB.getHeight() / 2)
+	};
 
-	var imagen = (config.tipo == "cubo") ? dictImg["cubo"] : dictImg[config.tipo + "_base" + base]
+	var mayorX = Math.max(elementoA.getX(), elementoA.getX() + elementoA.getWidth());
+	var mayorY = Math.max(elementoA.getY(), elementoA.getY() + elementoA.getHeight());
+	var menorX = Math.min(elementoA.getX(), elementoA.getX() + elementoA.getWidth());
+	var menorY = Math.min(elementoA.getY(), elementoA.getY() + elementoA.getHeight());
 
-	this.kineticImage = new Kinetic.Image({
+	if ((centroB.x > menorX && centroB.x < mayorX) && (centroB.y > menorY && centroB.y < mayorY)) {
+
+		return true;
+
+	}
+
+	return false;
+
+}
+
+function Elemento(x, y, tipo) {
+
+	this.x = x;
+	this.y = y;
+	this.tipo = tipo;
+
+	var imagen = (tipo == "cubo") ? dictImg["cubo"] : dictImg[tipo + "_base" + base]
+
+	var kineticImage = new Kinetic.Image({
 		x : this.x,
 		y : this.y,
 		image : imagen,
 		width : imagen.width,
 		height : imagen.height,
 		draggable : true,
-		name : config.tipo
+		name : tipo
 	});
 
-	this.kineticImage.on('mouseover', function() {
+	kineticImage.on('mouseover', function() {
 		document.body.style.cursor = 'pointer';
 	});
-	this.kineticImage.on('mouseout', function() {
+	kineticImage.on('mouseout', function() {
 		document.body.style.cursor = 'default';
 	});
-	var kine = this.kineticImage;
-	this.kineticImage.on('dragstart', function(kine) {
-		//kine.moveToTop();
-	}(kine));
 
-	return this.kineticImage;
+	var papelera = capaPapelera.get("#papelera")[0];
+
+	kineticImage.on('dragstart', function() {
+		kineticImage.moveToTop();
+	});
+
+	kineticImage.on('dragmove', function() {
+		if (hayColision(kineticImage, papelera)) {
+			kineticImage.transitionTo({
+				opacity : 0.6,
+				scale : {
+					x : 0.9,
+					y : 0.9
+				},
+				duration : 0.2,
+				easing : 'strong-ease-in'
+			});
+		} else if (kineticImage.getOpacity() != 1) {
+			kineticImage.transitionTo({
+				opacity : 1,
+				scale : {
+					x : 1,
+					y : 1
+				},
+				duration : 0.2,
+				easing : 'ease-out'
+			});
+		}
+	});
+
+	kineticImage.on('dragend', function() {
+		if (hayColision(kineticImage, papelera)) {
+			kineticImage.transitionTo({
+				x : papelera.getX(),
+				y : papelera.getY(),
+				scale : {
+					x : 0.5,
+					y : 0.5
+				},
+				duration : 0.3,
+				easing : 'back-ease-in',
+				callback : function() {
+					kineticImage.destroy();
+					capaCubos.draw();
+				}
+			});
+
+		}
+	});
+
+	return kineticImage;
 
 }
 
-function Boton(config) {
+function Boton(x, y, ancho, alto, contenido, onclick, ondrag) {
 
 	var boton;
-	var draggable = (config.ondrag != null) ? true : false;
+	var draggable = (ondrag != null) ? true : false;
 
-	if (config.contenido instanceof Image) {
+	if ( contenido instanceof Image) {
 		boton = new Kinetic.Image({
-			x : config.x,
-			y : config.y,
-			image : config.contenido,
-			width : config.ancho,
-			heigth : config.alto,
+			x : x,
+			y : y,
+			image : contenido,
+			width : ancho,
+			heigth : alto,
 			draggable : draggable,
 			dragBoundFunc : function(pos) {
 				return {
@@ -194,13 +283,13 @@ function Boton(config) {
 
 	} else {
 		boton = new Kinetic.Label({
-			x : config.x,
-			y : config.y,
+			x : x,
+			y : y,
 			opacity : 1,
-			width : config.ancho,
+			width : ancho,
 			listening : true,
 			text : {
-				text : config.contenido,
+				text : contenido,
 				fontSize : 12,
 				fontFamily : 'Calibri',
 				fill : '#555',
@@ -221,10 +310,10 @@ function Boton(config) {
 
 	}
 
-	boton.on('click tap', config.onclick);
+	boton.on('click tap', onclick);
 
 	if (draggable)
-		boton.on('dragstart', config.ondrag);
+		boton.on('dragstart', ondrag);
 
 	return boton;
 
@@ -234,10 +323,33 @@ function Boton(config) {
 $(document).ready(function() {
 	container = $('#container');
 	padre = $(container).parent();
+	escenario.add(capaPapelera);
 	escenario.add(capaCubos);
 	escenario.add(capaBotones);
 
-	$(window).resize(redimensionaCanvas);
+	$(window).resize(function() {
+		
+		var resolucionNativa;
+		if(Modernizr.mq('only screen and (min-width: 480px)') == true)
+		{
+			resolucionNativa = 480;
+		}
+		else if(Modernizr.mq('only screen and (max-width: 768px)') == true)
+		{
+			resolucionNativa = 768;
+		} else if (Modernizr.mq('only screen and (min-width: 1140px)') == true)
+		{
+			resolucionNativa = 1026;
+		}
+		
+		container.attr('width', $(padre).width());
+		escenario.setWidth($(padre).width());
+		escenario.setScale($(padre).width() / resolucionNativa, $(padre).width() / resolucionNativa);
+
+	});
+
+	$(window).resize();
+
 	container.on("mouseout", function() {
 		if (escenario.isDragging()) {
 			escenario.stopDrag();
@@ -247,16 +359,7 @@ $(document).ready(function() {
 		}
 	});
 
-	function redimensionaCanvas() {
-		container.attr('width', $(padre).width());
-		escenario.setWidth($(padre).width());
-		escenario.setHeight($(padre).height());
-		escenario.setScale($(padre).width() / 1026, $(padre).width() / 1026);
-	}
-
 	cargarImagenes();
-
-	redimensionaCanvas();
 
 	var seleccion = {
 		rect : null,
@@ -319,12 +422,23 @@ $(document).ready(function() {
 					continue;
 				}
 
-				var mayorX = Math.max(seleccion.origenX, seleccion.finalX);
-				var mayorY = Math.max(seleccion.origenY, seleccion.finalY);
-				var menorX = Math.min(seleccion.origenX, seleccion.finalX);
-				var menorY = Math.min(seleccion.origenY, seleccion.finalY);
+				/*var mayorX = Math.max(seleccion.origenX, seleccion.finalX);
+				 var mayorY = Math.max(seleccion.origenY, seleccion.finalY);
+				 var menorX = Math.min(seleccion.origenX, seleccion.finalX);
+				 var menorY = Math.min(seleccion.origenY, seleccion.finalY);
 
-				if ((cubo.getX() > menorX && cubo.getX() + cubo.getWidth() < mayorX) && (cubo.getY() > menorY && cubo.getY() + cubo.getHeight() < mayorY)) {
+				 if ((cubo.getX() > menorX && cubo.getX() + cubo.getWidth() < mayorX) && (cubo.getY() > menorY && cubo.getY() + cubo.getHeight() < mayorY)) {
+				 seleccionados.push(cubo);
+				 /*cubo.applyFilter(Kinetic.Filters.Grayscale, null, function() {
+				 capaCubos.draw();
+				 });
+				 if (seleccionados[0].getName() != cubo.getName()) {
+				 seleccionadoElementoDistinto = true;
+				 break;
+				 }
+				 }*/
+
+				if (hayColision(seleccion.rect, cubo)) {
 					seleccionados.push(cubo);
 					/*cubo.applyFilter(Kinetic.Filters.Grayscale, null, function() {
 					 capaCubos.draw();
@@ -352,37 +466,28 @@ $(document).ready(function() {
 
 function logicaJuego() {
 
-	
-	var imgBotonCubo = new Boton({
-		x : 866,
-		y : 80,
-		ancho : 50,
-		alto : 50,
-		contenido : dictImg["icono_cubo"],
-		onclick : function() {
-			var cubo = new Elemento(posiciones.cubo.x + posiciones.cubo.offsetX, posiciones.cubo.y + posiciones.cubo.offsetY, "cubo");
+	var imgBotonCubo = new Boton(866, 80, 50, 50, dictImg["icono_cubo"], function() {
+		var cubo = new Elemento(posiciones.cubo.x + posiciones.cubo.offsetX, posiciones.cubo.y + posiciones.cubo.offsetY, "cubo");
 
-			capaCubos.add(cubo);
+		capaCubos.add(cubo);
 
-			posiciones.cubo.offsetY += 50;
+		posiciones.cubo.offsetY += 50;
 
-			if (posiciones.cubo.offsetY > escenario.getHeight()) {
-				posiciones.cubo.offsetY = 60;
-				posiciones.cubo.offsetX += 40;
-			}
-
-			cubo.draw();
-		},
-		ondrag : function() {
-
-			var cubo = new Elemento(posicionRaton().x - (dictImg["cubo"].width / 2), posicionRaton().y - (dictImg["cubo"].height / 2), "cubo");
-			capaCubos.add(cubo);
-			cubo.startDrag();
-
+		if (posiciones.cubo.offsetY > escenario.getHeight()) {
+			posiciones.cubo.offsetY = 60;
+			posiciones.cubo.offsetX += 40;
 		}
+
+		cubo.draw();
+	}, function() {
+
+		var cubo = new Elemento(posicionRaton().x - (dictImg["cubo"].width / 2), posicionRaton().y - (dictImg["cubo"].height / 2), "cubo");
+		capaCubos.add(cubo);
+		cubo.startDrag();
+
 	});
 
-	var imgBotonBarras = new Boton(610, 30, 100, 100, dictImg["icono_barra"], function() {
+	var imgBotonBarras = new Boton(610, 80, 100, 100, dictImg["icono_barra"], function() {
 
 		var barra = new Elemento(posiciones.barra.x + posiciones.barra.offsetX, posiciones.barra.y + posiciones.barra.offsetY, "barra");
 
@@ -405,7 +510,7 @@ function logicaJuego() {
 
 	});
 
-	var imgBotonPlacas = new Boton(354, 20, 100, 100, dictImg["icono_placa"], function() {
+	var imgBotonPlacas = new Boton(354, 80, 100, 100, dictImg["icono_placa"], function() {
 
 		var placa = new Elemento(posiciones.placa.x + posiciones.placa.offsetX, posiciones.placa.y + posiciones.placa.offsetY, "placa");
 
@@ -428,7 +533,7 @@ function logicaJuego() {
 
 	});
 
-	var imgBotonBloques = new Boton(95, 5, 100, 100, dictImg["icono_bloque"], function() {
+	var imgBotonBloques = new Boton(95, 80, 100, 100, dictImg["icono_bloque"], function() {
 
 		var bloque = new Elemento(posiciones.bloque.x + posiciones.bloque.offsetX, posiciones.bloque.y + posiciones.bloque.offsetY, "bloque");
 
@@ -468,7 +573,9 @@ function logicaJuego() {
 		capaCubos.draw();
 	});
 
-	capaBotones.add(botonLimpiar);
+	botonLimpiar.setId("papelera");
+
+	capaPapelera.add(botonLimpiar);
 
 	capaBotones.add(imgBotonCubo);
 
@@ -479,4 +586,6 @@ function logicaJuego() {
 	capaBotones.add(imgBotonBloques);
 
 	capaBotones.draw();
+	capaCubos.draw();
+	capaPapelera.draw();
 }
