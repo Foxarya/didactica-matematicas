@@ -63,7 +63,7 @@ function posicionRaton() {
 function cargarImagenes() {
 
 	var barraCarga = new Kinetic.Rect({
-		x : escenario.getWidth() / 2 - 100,
+		x : escenario.getWidth() / 2 - 250,
 		y : escenario.getHeight() / 2,
 		width : 0,
 		height : 5,
@@ -90,9 +90,9 @@ function cargarImagenes() {
 					dictImg[nombreImagen] = imagen;
 					cargadas++;
 					barraCarga.transitionTo({
-						width : cargadas * 10,
+						width : ((cargadas * 100) / numeroImagenes) * 5,
 						duration : 0.1,
-						easing: 'ease-in-out'
+						easing : 'ease-in-out'
 					});
 					barraCarga.draw();
 					if (cargadas == numeroImagenes) {
@@ -309,6 +309,13 @@ function Boton(x, y, ancho, alto, contenido, onclick, ondrag) {
 		});
 
 	}
+	
+	boton.on('mouseover', function() {
+		document.body.style.cursor = 'pointer';
+	});
+	boton.on('mouseout', function() {
+		document.body.style.cursor = 'default';
+	});
 
 	boton.on('click tap', onclick);
 
@@ -328,9 +335,7 @@ $(document).ready(function() {
 	escenario.add(capaBotones);
 
 	$(window).resize(function() {
-		
-		
-		
+
 		container.attr('width', $(padre).width());
 		escenario.setWidth($(padre).width());
 		escenario.setScale($(padre).width() / 1026, $(padre).width() / 1026);
