@@ -20,7 +20,7 @@ var offsetYBloque = 60;
 var dictImg = {};
 
 
-var base = 6;
+var base = 5;
 
 function cargarImagenes() {
 

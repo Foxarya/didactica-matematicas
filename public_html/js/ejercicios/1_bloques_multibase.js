@@ -51,7 +51,7 @@ var prioridad = ["bloque", "placa", "barra", "cubo"];
 
 var dictImg = {};
 
-var base = 4;
+var base = 3;
 
 function posicionRaton() {
 	return {
@@ -92,7 +92,7 @@ function cargarImagenes() {
 					barraCarga.transitionTo({
 						width : cargadas * 10,
 						duration : 0.1,
-						easing: 'ease-in-out'
+						easing : 'ease-in-out'
 					});
 					barraCarga.draw();
 					if (cargadas == numeroImagenes) {
@@ -328,9 +328,7 @@ $(document).ready(function() {
 	escenario.add(capaBotones);
 
 	$(window).resize(function() {
-		
-		
-		
+
 		container.attr('width', $(padre).width());
 		escenario.setWidth($(padre).width());
 		escenario.setScale($(padre).width() / 1026, $(padre).width() / 1026);
@@ -499,7 +497,7 @@ function logicaJuego() {
 
 	});
 
-	var imgBotonPlacas = new Boton(354, 80, 100, 100, dictImg["icono_placa"], function() {
+	var imgBotonPlacas = new Boton(354, 78, 100, 100, dictImg["icono_placa"], function() {
 
 		var placa = new Elemento(posiciones.placa.x + posiciones.placa.offsetX, posiciones.placa.y + posiciones.placa.offsetY, "placa");
 
@@ -522,7 +520,7 @@ function logicaJuego() {
 
 	});
 
-	var imgBotonBloques = new Boton(95, 80, 100, 100, dictImg["icono_bloque"], function() {
+	var imgBotonBloques = new Boton(95, 60, 100, 100, dictImg["icono_bloque"], function() {
 
 		var bloque = new Elemento(posiciones.bloque.x + posiciones.bloque.offsetX, posiciones.bloque.y + posiciones.bloque.offsetY, "bloque");
 
@@ -563,6 +561,30 @@ function logicaJuego() {
 	});
 
 	botonLimpiar.setId("papelera");
+
+	var representacionNumerica = new Kinetic.Text({
+		x : escenario.getWidth() / 2,
+		y : 15,
+		text : '1 1 1 1',
+		fontSize : 30,
+		fontFamily : 'Calibri',
+		fill : 'black'
+	});
+	
+	var representacionBase = new Kinetic.Text({
+		x : escenario.getWidth() / 2,
+		y : 45,
+		text : 'Base: '+base,
+		fontSize : 18,
+		fontFamily : 'Calibri',
+		fill : 'black'
+	});
+
+	representacionNumerica.setX((escenario.getWidth() / 2) - (representacionNumerica.getWidth() / 2));
+	representacionBase.setX((escenario.getWidth()/2)- (representacionBase.getWidth()/2));
+
+	capaBotones.add(representacionNumerica);
+	capaBotones.add(representacionBase);
 
 	capaPapelera.add(botonLimpiar);
 
