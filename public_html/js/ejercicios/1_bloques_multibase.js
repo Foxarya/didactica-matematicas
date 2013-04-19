@@ -646,7 +646,7 @@ function logicaJuego() {
 			base++;
 			representacionBase.setText("Base " + bases[base]);
 			capaBotones.draw();
-			//capaCubos.removeChildren();
+			capaCubos.removeChildren();
 			
 			capaCubos.draw();
 		}
