@@ -49,9 +49,11 @@ var posiciones = {
 
 var prioridad = ["bloque", "placa", "barra", "cubo"];
 
+var bases = [2, 3, 4, 5, 6, 8, 10, 12];
+
 var dictImg = {};
 
-var base = 2;
+var base = 0;
 
 function posicionRaton() {
 	return {
@@ -146,17 +148,17 @@ function agrupar(elementos) {
 	};
 	var offsetX = coordenadas.x;
 
-	for (var i = 0; i < elementos.length - (elementos.length % base); i++) {
+	for (var i = 0; i < elementos.length - (elementos.length % bases[base]); i++) {
 		var elemento = elementos[i];
 
-		if (i + 1 == elementos.length - (elementos.length % base)) {
+		if (i + 1 == elementos.length - (elementos.length % bases[base])) {
 			elemento.transitionTo({
 				x : coordenadas.x,
 				y : coordenadas.y,
 				duration : 1,
 				easing : 'ease-in-out',
 				callback : function() {
-					for (var i = 0; i < elementos.length - (elementos.length % base); i++) {
+					for (var i = 0; i < elementos.length - (elementos.length % bases[base]); i++) {
 						var elemento = elementos[i];
 						var tipo;
 						if (i == 0)
@@ -164,7 +166,7 @@ function agrupar(elementos) {
 
 						elemento.destroy();
 
-						if (i % base == 0) {
+						if (i % bases[base] == 0) {
 							var siguiente = new Elemento(coordenadas.x, coordenadas.y, prioridad[tipo - 1]);
 
 							capaCubos.add(siguiente);
@@ -217,7 +219,7 @@ function Elemento(x, y, tipo) {
 	this.y = y;
 	this.tipo = tipo;
 
-	var imagen = (tipo == "cubo") ? dictImg["cubo"] : dictImg[tipo + "_base" + base];
+	var imagen = (tipo == "cubo") ? dictImg["cubo"] : dictImg[tipo + "_base" + bases[base]];
 
 	var kineticImage = new Kinetic.Image({
 		x : this.x,
@@ -475,7 +477,7 @@ $(document).ready(function() {
 
 			}
 
-			if (seleccionados.length >= base && !seleccionadoElementoDistinto) {
+			if (seleccionados.length >= bases[base] && !seleccionadoElementoDistinto) {
 
 				agrupar(seleccionados);
 			}
@@ -528,7 +530,7 @@ function logicaJuego() {
 
 	}, function() {
 
-		var barra = new Elemento(posicionRaton().x - (dictImg["barra_base" + base].width / 2), posicionRaton().y - (dictImg["barra_base" + base].height / 2), "barra");
+		var barra = new Elemento(posicionRaton().x - (dictImg["barra_base" + bases[base]].width / 2), posicionRaton().y - (dictImg["barra_base" + bases[base]].height / 2), "barra");
 		capaCubos.add(barra);
 		barra.startDrag();
 
@@ -551,7 +553,7 @@ function logicaJuego() {
 
 	}, function() {
 
-		var placa = new Elemento(posicionRaton().x - (dictImg["placa_base" + base].width / 2), posicionRaton().y - (dictImg["placa_base" + base].height / 2), "placa");
+		var placa = new Elemento(posicionRaton().x - (dictImg["placa_base" + bases[base]].width / 2), posicionRaton().y - (dictImg["placa_base" + bases[base]].height / 2), "placa");
 		capaCubos.add(placa);
 		placa.startDrag();
 
@@ -573,7 +575,7 @@ function logicaJuego() {
 
 	}, function() {
 
-		var bloque = new Elemento(posicionRaton().x - (dictImg["bloque_base" + base].width / 2), posicionRaton().y - (dictImg["bloque_base" + base].height / 2), "bloque");
+		var bloque = new Elemento(posicionRaton().x - (dictImg["bloque_base" + bases[base]].width / 2), posicionRaton().y - (dictImg["bloque_base" + bases[base]].height / 2), "bloque");
 		capaCubos.add(bloque);
 		bloque.startDrag();
 
@@ -602,15 +604,15 @@ function logicaJuego() {
 	var representacionNumerica = new Kinetic.Text({
 		x : escenario.getWidth() / 2,
 		y : 15,
-		text : '0000',
+		text : '0 0 0 0 ',
 		fontSize : 30,
 		fontFamily : 'Calibri',
 		fill : 'black'
 	});
 	var representacionBase = new Kinetic.Text({
 		x : escenario.getWidth() / 2,
-		y : 45,
-		text : 'Base: ' + base,
+		y : 47,
+		text : 'Base ' + bases[base],
 		fontSize : 18,
 		fontFamily : 'Calibri',
 		fill : 'black'
@@ -620,6 +622,33 @@ function logicaJuego() {
 
 	representacionNumerica.setX((escenario.getWidth() / 2) - (representacionNumerica.getWidth() / 2));
 	representacionBase.setX((escenario.getWidth() / 2) - (representacionBase.getWidth() / 2));
+
+	var imgSubirBase = new Boton(representacionBase.getX() + representacionBase.getWidth() + 20, 45, 24, 24, dictImg["subirBase"], function() {
+
+		if (base != bases.length - 1) {
+			base++;
+			representacionBase.setText("Base " + bases[base]);
+			capaBotones.draw();
+			capaCubos.removeChildren();
+			capaCubos.draw();
+		}
+
+	});
+
+	var imgBajarBase = new Boton(representacionBase.getX() -40, 45, 24, 24, dictImg["bajarBase"], function() {
+
+		if (base != 0) {
+			base--;
+			representacionBase.setText("Base " + bases[base]);
+			capaBotones.draw();
+			capaCubos.removeChildren();
+			capaCubos.draw();
+		}
+
+	});
+
+	capaBotones.add(imgSubirBase);
+	capaBotones.add(imgBajarBase);
 
 	capaBotones.add(representacionNumerica);
 	capaBotones.add(representacionBase);
