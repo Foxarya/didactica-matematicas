@@ -18,8 +18,6 @@ var capaBotones = new Kinetic.Layer();
 var capaCubos = new Kinetic.Layer();
 var capaPapelera = new Kinetic.Layer();
 
-var numeroRepresentado;
-
 var posiciones = {
 
 	cubo : {
@@ -53,7 +51,7 @@ var prioridad = ["bloque", "placa", "barra", "cubo"];
 
 var dictImg = {};
 
-var base = 3;
+var base = 2;
 
 function posicionRaton() {
 	return {
@@ -108,6 +106,36 @@ function cargarImagenes() {
 			});
 		}
 	});
+
+}
+
+function cuentaRepresentados() {
+
+	var numero = 0;
+	var devolver = "";
+	var multi = 1000;
+	var id = ["bloque", "placa", "barra", "cubo"];
+	for (var i = 0; i < id.length; i++) {
+		var elementos = capaCubos.get("." + id[i]);
+		if (elementos.length != 0) {
+			numero += elementos.length * multi;
+		}
+		multi /= 10;
+	}
+	var contador = 0;
+	for (var i = 4; i >= 0; i--) {
+		if (numero.toString().length < i) {
+			devolver += "0 ";
+		} else {
+
+			devolver += numero.toString().charAt(contador) + " ";
+			contador++;
+
+		}
+
+	}
+
+	return devolver;
 
 }
 
@@ -190,39 +218,6 @@ function Elemento(x, y, tipo) {
 	this.tipo = tipo;
 
 	var imagen = (tipo == "cubo") ? dictImg["cubo"] : dictImg[tipo + "_base" + base];
-
-	switch(tipo) {
-		case "cubo":
-			if(numeroRepresentado[0] < base)
-			{
-				numeroRepresentado++;
-			} else {
-				return;
-			}
-			break;
-		case "barra":
-			if(numeroRepresentado[1] < base)
-			{
-				numeroRepresentado += 10;
-			} else {
-				return;
-			}
-			break;
-		case "placa":
-			if (numeroRepresentado[2] < base) {
-				numeroRepresentado += 100;
-			} else {
-				return;
-			}
-			break;
-		case "bloque":
-			if (numeroRepresentado[3] < base) {
-				numeroRepresentado += 1000;
-			} else {
-				return;
-			}
-			break;
-	}
 
 	var kineticImage = new Kinetic.Image({
 		x : this.x,
@@ -607,23 +602,24 @@ function logicaJuego() {
 	var representacionNumerica = new Kinetic.Text({
 		x : escenario.getWidth() / 2,
 		y : 15,
-		text : '1 1 1 1',
+		text : '0000',
 		fontSize : 30,
 		fontFamily : 'Calibri',
 		fill : 'black'
 	});
-	
 	var representacionBase = new Kinetic.Text({
 		x : escenario.getWidth() / 2,
 		y : 45,
-		text : 'Base: '+base,
+		text : 'Base: ' + base,
 		fontSize : 18,
 		fontFamily : 'Calibri',
 		fill : 'black'
 	});
 
+	representacionNumerica.setId("numero");
+
 	representacionNumerica.setX((escenario.getWidth() / 2) - (representacionNumerica.getWidth() / 2));
-	representacionBase.setX((escenario.getWidth()/2)- (representacionBase.getWidth()/2));
+	representacionBase.setX((escenario.getWidth() / 2) - (representacionBase.getWidth() / 2));
 
 	capaBotones.add(representacionNumerica);
 	capaBotones.add(representacionBase);
@@ -637,6 +633,11 @@ function logicaJuego() {
 	capaBotones.add(imgBotonPlacas);
 
 	capaBotones.add(imgBotonBloques);
+
+	capaCubos.on('draw', function() {
+		representacionNumerica.setText(cuentaRepresentados());
+		capaBotones.draw();
+	});
 
 	capaBotones.draw();
 	capaCubos.draw();
