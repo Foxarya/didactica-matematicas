@@ -18,6 +18,8 @@ var capaBotones = new Kinetic.Layer();
 var capaCubos = new Kinetic.Layer();
 var capaPapelera = new Kinetic.Layer();
 
+var numeroRepresentado;
+
 var posiciones = {
 
 	cubo : {
@@ -187,7 +189,40 @@ function Elemento(x, y, tipo) {
 	this.y = y;
 	this.tipo = tipo;
 
-	var imagen = (tipo == "cubo") ? dictImg["cubo"] : dictImg[tipo + "_base" + base]
+	var imagen = (tipo == "cubo") ? dictImg["cubo"] : dictImg[tipo + "_base" + base];
+
+	switch(tipo) {
+		case "cubo":
+			if(numeroRepresentado[0] < base)
+			{
+				numeroRepresentado++;
+			} else {
+				return;
+			}
+			break;
+		case "barra":
+			if(numeroRepresentado[1] < base)
+			{
+				numeroRepresentado += 10;
+			} else {
+				return;
+			}
+			break;
+		case "placa":
+			if (numeroRepresentado[2] < base) {
+				numeroRepresentado += 100;
+			} else {
+				return;
+			}
+			break;
+		case "bloque":
+			if (numeroRepresentado[3] < base) {
+				numeroRepresentado += 1000;
+			} else {
+				return;
+			}
+			break;
+	}
 
 	var kineticImage = new Kinetic.Image({
 		x : this.x,
@@ -309,7 +344,7 @@ function Boton(x, y, ancho, alto, contenido, onclick, ondrag) {
 		});
 
 	}
-	
+
 	boton.on('mouseover', function() {
 		document.body.style.cursor = 'pointer';
 	});
