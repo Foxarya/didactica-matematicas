@@ -238,6 +238,23 @@ function Elemento(x, y, tipo) {
 		document.body.style.cursor = 'default';
 	});
 
+	kineticImage.on('dblclick dbltap', function() {
+
+		if (tipo != "cubo") {
+			var siguientes = prioridad[prioridad.indexOf(tipo)+1];
+			var offsetY = 0;
+			for(var i = 0; i < bases[base]; i++)
+			{
+				var desagrupado = new Elemento(kineticImage.getX(), kineticImage.getY() + offsetY, siguientes);
+				capaCubos.add(desagrupado);
+				offsetY += 30;
+			}
+			kineticImage.destroy();
+			capaCubos.draw();
+		}
+
+	});
+
 	var papelera = capaPapelera.get("#papelera")[0];
 
 	kineticImage.on('dragstart', function() {
@@ -629,13 +646,14 @@ function logicaJuego() {
 			base++;
 			representacionBase.setText("Base " + bases[base]);
 			capaBotones.draw();
-			capaCubos.removeChildren();
+			//capaCubos.removeChildren();
+			
 			capaCubos.draw();
 		}
 
 	});
 
-	var imgBajarBase = new Boton(representacionBase.getX() -40, 45, 24, 24, dictImg["bajarBase"], function() {
+	var imgBajarBase = new Boton(representacionBase.getX() - 40, 45, 24, 24, dictImg["bajarBase"], function() {
 
 		if (base != 0) {
 			base--;
