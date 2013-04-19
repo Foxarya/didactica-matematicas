@@ -329,22 +329,11 @@ $(document).ready(function() {
 
 	$(window).resize(function() {
 		
-		var resolucionNativa;
-		if(Modernizr.mq('only screen and (min-width: 480px)') == true)
-		{
-			resolucionNativa = 480;
-		}
-		else if(Modernizr.mq('only screen and (max-width: 768px)') == true)
-		{
-			resolucionNativa = 768;
-		} else if (Modernizr.mq('only screen and (min-width: 1140px)') == true)
-		{
-			resolucionNativa = 1026;
-		}
+		
 		
 		container.attr('width', $(padre).width());
 		escenario.setWidth($(padre).width());
-		escenario.setScale($(padre).width() / resolucionNativa, $(padre).width() / resolucionNativa);
+		escenario.setScale($(padre).width() / 1026, $(padre).width() / 1026);
 
 	});
 
