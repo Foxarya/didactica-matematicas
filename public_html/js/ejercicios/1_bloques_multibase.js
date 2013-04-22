@@ -241,10 +241,9 @@ function Elemento(x, y, tipo) {
 	kineticImage.on('dblclick dbltap', function() {
 
 		if (tipo != "cubo") {
-			var siguientes = prioridad[prioridad.indexOf(tipo)+1];
+			var siguientes = prioridad[prioridad.indexOf(tipo) + 1];
 			var offsetY = 0;
-			for(var i = 0; i < bases[base]; i++)
-			{
+			for (var i = 0; i < bases[base]; i++) {
 				var desagrupado = new Elemento(kineticImage.getX(), kineticImage.getY() + offsetY, siguientes);
 				capaCubos.add(desagrupado);
 				offsetY += 30;
@@ -647,7 +646,7 @@ function logicaJuego() {
 			representacionBase.setText("Base " + bases[base]);
 			capaBotones.draw();
 			capaCubos.removeChildren();
-			
+
 			capaCubos.draw();
 		}
 
@@ -682,8 +681,28 @@ function logicaJuego() {
 	capaBotones.add(imgBotonBloques);
 
 	capaCubos.on('draw', function() {
-		representacionNumerica.setText(cuentaRepresentados());
-		capaBotones.draw();
+
+		var cuenta = cuentaRepresentados();
+
+		for (var i = 0; i < cuenta.length; i++) {
+
+			if (parseInt(cuenta.charAt(i)) >= bases[base] || parseInt(cuenta.charAt(i)) == -1 ) {
+				representacionNumerica.hide();
+				capaBotones.draw();
+				return;
+			} else {
+				
+				if(!representacionNumerica.isVisible())
+					representacionNumerica.show();
+				
+				
+				representacionNumerica.setText(cuenta);
+				capaBotones.draw();
+
+			}
+
+		}
+
 	});
 
 	capaBotones.draw();
