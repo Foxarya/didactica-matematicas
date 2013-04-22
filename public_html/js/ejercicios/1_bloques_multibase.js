@@ -23,26 +23,34 @@ var posiciones = {
 	cubo : {
 		x : 780,
 		y : 60,
-		offsetX : 0,
-		offsetY : 0
+		offset : {
+			x : 17,
+			y : 0
+		}
 	},
 	barra : {
 		x : 480,
 		y : 60,
-		offsetX : 0,
-		offsetY : 0
+		offset : {
+			x: 0,
+			y: 17
+		}
 	},
 	placa : {
 		x : 280,
 		y : 60,
-		offsetX : 0,
-		offsetY : 0
+		offset : {
+			x: 8,
+			y: -17
+		}
 	},
 	bloque : {
 		x : 5,
 		y : 60,
-		offsetX : 0,
-		offsetY : 0
+		offset : {
+			x: 0,
+			y: 0
+		}
 	}
 
 };
@@ -119,6 +127,9 @@ function cuentaRepresentados() {
 	var id = ["bloque", "placa", "barra", "cubo"];
 	for (var i = 0; i < id.length; i++) {
 		var elementos = capaCubos.get("." + id[i]);
+		if (elementos > 9) {
+			return -1;
+		}
 		if (elementos.length != 0) {
 			numero += elementos.length * multi;
 		}
@@ -146,23 +157,29 @@ function agrupar(elementos) {
 		x : elementos[0].getX(),
 		y : elementos[0].getY()
 	};
-	var offsetX = coordenadas.x;
+	var offset = {
+		x : 0,
+		y : 0
+	};
 
 	for (var i = 0; i < elementos.length - (elementos.length % bases[base]); i++) {
 		var elemento = elementos[i];
 
+		var tipo;
+		if (i == 0)
+			tipo = prioridad.indexOf(elemento.getName());
+
 		if (i + 1 == elementos.length - (elementos.length % bases[base])) {
+			elemento.moveUp();
 			elemento.transitionTo({
-				x : coordenadas.x,
-				y : coordenadas.y,
+				x : coordenadas.x + offset.x,
+				y : coordenadas.y + offset.y,
 				duration : 1,
 				easing : 'ease-in-out',
 				callback : function() {
+
 					for (var i = 0; i < elementos.length - (elementos.length % bases[base]); i++) {
 						var elemento = elementos[i];
-						var tipo;
-						if (i == 0)
-							tipo = prioridad.indexOf(elemento.getName());
 
 						elemento.destroy();
 
@@ -179,16 +196,27 @@ function agrupar(elementos) {
 				}
 			});
 		} else {
+			elemento.moveUp();
 			elemento.transitionTo({
-				x : coordenadas.x,
-				y : coordenadas.y,
+				x : coordenadas.x + offset.x,
+				y : coordenadas.y + offset.y,
 				duration : 1,
 				easing : 'ease-in-out'
 			});
-			offsetX += 9;
+			offset.x += posiciones[elemento.getName()].offset.x;
+			offset.y += posiciones[elemento.getName()].offset.y;
+			
 		}
+		
+		if (i+1 % bases[base] == 0) {
+			offset.y += 20;
+		}
+		
 
 	}
+	
+	
+	
 }
 
 function hayColision(elementoA, elementoB) {
@@ -241,10 +269,9 @@ function Elemento(x, y, tipo) {
 	kineticImage.on('dblclick dbltap', function() {
 
 		if (tipo != "cubo") {
-			var siguientes = prioridad[prioridad.indexOf(tipo)+1];
+			var siguientes = prioridad[prioridad.indexOf(tipo) + 1];
 			var offsetY = 0;
-			for(var i = 0; i < bases[base]; i++)
-			{
+			for (var i = 0; i < bases[base]; i++) {
 				var desagrupado = new Elemento(kineticImage.getX(), kineticImage.getY() + offsetY, siguientes);
 				capaCubos.add(desagrupado);
 				offsetY += 30;
@@ -647,7 +674,7 @@ function logicaJuego() {
 			representacionBase.setText("Base " + bases[base]);
 			capaBotones.draw();
 			capaCubos.removeChildren();
-			
+
 			capaCubos.draw();
 		}
 
