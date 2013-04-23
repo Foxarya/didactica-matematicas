@@ -32,24 +32,24 @@ var posiciones = {
 		x : 480,
 		y : 60,
 		offset : {
-			x: 0,
-			y: 17
+			x : 0,
+			y : 17
 		}
 	},
 	placa : {
 		x : 280,
 		y : 60,
 		offset : {
-			x: 8,
-			y: -17
+			x : 8,
+			y : -17
 		}
 	},
 	bloque : {
 		x : 5,
 		y : 60,
 		offset : {
-			x: 0,
-			y: 0
+			x : 0,
+			y : 0
 		}
 	}
 
@@ -59,9 +59,18 @@ var prioridad = ["bloque", "placa", "barra", "cubo"];
 
 var bases = [2, 3, 4, 5, 6, 8, 10, 12];
 
+var limites = [15, 80, 255, 624, 1295, 4095, 9999, 20735];
+
 var dictImg = {};
 
-var base = 0;
+var base = 3;
+
+function tamaño() {
+	return {
+		width : escenario.getWidth() / escenario.getScale().x,
+		height : escenario.getHeight() / escenario.getScale().y
+	}
+}
 
 function posicionRaton() {
 	return {
@@ -73,8 +82,8 @@ function posicionRaton() {
 function cargarImagenes() {
 
 	var barraCarga = new Kinetic.Rect({
-		x : escenario.getWidth() / 2 - 250,
-		y : escenario.getHeight() / 2,
+		x : tamaño().width / 2 - 250,
+		y : tamaño().height / 2,
 		width : 0,
 		height : 5,
 		stroke : 'black',
@@ -97,6 +106,7 @@ function cargarImagenes() {
 				var imagen = new Image();
 
 				imagen.onload = function() {
+
 					dictImg[nombreImagen] = imagen;
 					cargadas++;
 					barraCarga.transitionTo({
@@ -124,31 +134,45 @@ function cuentaRepresentados() {
 	var numero = 0;
 	var devolver = "";
 	var multi = 1000;
+	var numbase10 = 0;
+
 	var id = ["bloque", "placa", "barra", "cubo"];
+	var contador = 3;
 	for (var i = 0; i < id.length; i++) {
 		var elementos = capaCubos.get("." + id[i]);
-		if (elementos > 9) {
-			return -1;
+		if (elementos.length >= bases[base] || elementos.length > 9) {
+			devolver = "nada";
+			numero += 9 * multi;
 		}
+		
 		if (elementos.length != 0) {
 			numero += elementos.length * multi;
 		}
+		numbase10 += elementos.length * Math.pow(bases[base], contador);
+		contador--;
+
 		multi /= 10;
 	}
-	var contador = 0;
-	for (var i = 4; i >= 0; i--) {
-		if (numero.toString().length < i) {
-			devolver += "0 ";
-		} else {
+	if (devolver != "nada") {
+		var contador = 0;
+		for (var i = 4; i >= 0; i--) {
+			if (numero.toString().length < i) {
+				devolver += "0 ";
+			} else {
 
-			devolver += numero.toString().charAt(contador) + " ";
-			contador++;
+				devolver += numero.toString().charAt(contador) + " ";
+				contador++;
+
+			}
 
 		}
-
 	}
 
-	return devolver;
+	return {
+		integer : numero,
+		texto : devolver,
+		base10 : numbase10
+	};
 
 }
 
@@ -205,18 +229,15 @@ function agrupar(elementos) {
 			});
 			offset.x += posiciones[elemento.getName()].offset.x;
 			offset.y += posiciones[elemento.getName()].offset.y;
-			
+
 		}
-		
-		if (i+1 % bases[base] == 0) {
+
+		if (i + 1 % bases[base] == 0) {
 			offset.y += 20;
 		}
-		
 
 	}
-	
-	
-	
+
 }
 
 function hayColision(elementoA, elementoB) {
@@ -258,6 +279,8 @@ function Elemento(x, y, tipo) {
 		draggable : true,
 		name : tipo
 	});
+
+	kineticImage.createImageHitRegion();
 
 	kineticImage.on('mouseover', function() {
 		document.body.style.cursor = 'pointer';
@@ -537,16 +560,9 @@ $(document).ready(function() {
 function logicaJuego() {
 
 	var imgBotonCubo = new Boton(866, 80, 50, 50, dictImg["icono_cubo"], function() {
-		var cubo = new Elemento(posiciones.cubo.x + posiciones.cubo.offsetX, posiciones.cubo.y + posiciones.cubo.offsetY, "cubo");
+		var cubo = new Elemento(posiciones.cubo.x, posiciones.cubo.y, "cubo");
 
 		capaCubos.add(cubo);
-
-		posiciones.cubo.offsetY += 50;
-
-		if (posiciones.cubo.offsetY > escenario.getHeight()) {
-			posiciones.cubo.offsetY = 60;
-			posiciones.cubo.offsetX += 40;
-		}
 
 		cubo.draw();
 	}, function() {
@@ -559,16 +575,9 @@ function logicaJuego() {
 
 	var imgBotonBarras = new Boton(610, 80, 100, 100, dictImg["icono_barra"], function() {
 
-		var barra = new Elemento(posiciones.barra.x + posiciones.barra.offsetX, posiciones.barra.y + posiciones.barra.offsetY, "barra");
+		var barra = new Elemento(posiciones.barra.x, posiciones.barra.y, "barra");
 
 		capaCubos.add(barra);
-
-		posiciones.barra.offsetY += 50;
-
-		if (posiciones.barra.offsetY >= escenario.getHeight()) {
-			posiciones.barra.offsetY = 60;
-			posiciones.barra.offsetX += 40;
-		}
 
 		barra.draw();
 
@@ -582,16 +591,9 @@ function logicaJuego() {
 
 	var imgBotonPlacas = new Boton(354, 78, 100, 100, dictImg["icono_placa"], function() {
 
-		var placa = new Elemento(posiciones.placa.x + posiciones.placa.offsetX, posiciones.placa.y + posiciones.placa.offsetY, "placa");
+		var placa = new Elemento(posiciones.placa.x, posiciones.placa.y, "placa");
 
 		capaCubos.add(placa);
-
-		posiciones.placa.offsetY += 80;
-
-		if (posiciones.placa.offsetY > escenario.getHeight()) {
-			posiciones.placa.offsetY = 60;
-			posiciones.placa.offsetX += 40;
-		}
 
 		placa.draw();
 
@@ -605,15 +607,15 @@ function logicaJuego() {
 
 	var imgBotonBloques = new Boton(95, 60, 100, 100, dictImg["icono_bloque"], function() {
 
-		var bloque = new Elemento(posiciones.bloque.x + posiciones.bloque.offsetX, posiciones.bloque.y + posiciones.bloque.offsetY, "bloque");
+		var bloque = new Elemento(posiciones.bloque.x, posiciones.bloque.y, "bloque");
 
 		capaCubos.add(bloque);
 
-		posiciones.bloque.offsetY += 100;
+		posiciones.bloque.offset.y += 100;
 
-		if (posiciones.bloque.offsetY > escenario.getHeight()) {
-			posiciones.bloque.offsetY = 60;
-			posiciones.bloque.offsetX += 40;
+		if (posiciones.bloque.offset.y > escenario.getHeight()) {
+			posiciones.bloque.offset.y = 60;
+			posiciones.bloque.offset.x += 40;
 		}
 		bloque.draw();
 
@@ -646,7 +648,7 @@ function logicaJuego() {
 	botonLimpiar.setId("papelera");
 
 	var representacionNumerica = new Kinetic.Text({
-		x : escenario.getWidth() / 2,
+		x : tamaño().width / 2,
 		y : 15,
 		text : '0 0 0 0 ',
 		fontSize : 30,
@@ -654,7 +656,7 @@ function logicaJuego() {
 		fill : 'black'
 	});
 	var representacionBase = new Kinetic.Text({
-		x : escenario.getWidth() / 2,
+		x : tamaño().width / 2,
 		y : 47,
 		text : 'Base ' + bases[base],
 		fontSize : 18,
@@ -664,8 +666,8 @@ function logicaJuego() {
 
 	representacionNumerica.setId("numero");
 
-	representacionNumerica.setX((escenario.getWidth() / 2) - (representacionNumerica.getWidth() / 2));
-	representacionBase.setX((escenario.getWidth() / 2) - (representacionBase.getWidth() / 2));
+	representacionNumerica.setX((tamaño().width / 2) - (representacionNumerica.getWidth() / 2));
+	representacionBase.setX((tamaño().width / 2) - (representacionBase.getWidth() / 2));
 
 	var imgSubirBase = new Boton(representacionBase.getX() + representacionBase.getWidth() + 20, 45, 24, 24, dictImg["subirBase"], function() {
 
@@ -676,6 +678,12 @@ function logicaJuego() {
 			capaCubos.removeChildren();
 
 			capaCubos.draw();
+			
+		}
+		
+		if(base == bases.length - 1){
+			this.hide();
+			capaBotones.draw();
 		}
 
 	});
@@ -689,8 +697,15 @@ function logicaJuego() {
 			capaCubos.removeChildren();
 			capaCubos.draw();
 		}
+		
+		if(base == 0){
+			this.hide();
+			capaBotones.draw();
+		}
 
 	});
+
+	var botones = [imgBotonCubo, imgBotonBarras, imgBotonPlacas, imgBotonBloques];
 
 	capaBotones.add(imgSubirBase);
 	capaBotones.add(imgBajarBase);
@@ -712,24 +727,41 @@ function logicaJuego() {
 
 		var cuenta = cuentaRepresentados();
 
-		for (var i = 0; i < cuenta.length; i++) {
-
-			if (parseInt(cuenta.charAt(i)) >= bases[base] || parseInt(cuenta.charAt(i)) == -1 ) {
-				representacionNumerica.hide();
-				capaBotones.draw();
-				return;
+		for (var i = 0; i < botones.length; i++) {
+			if (cuenta.base10 + Math.pow(bases[base], i) > limites[base]) {
+				if (botones[i].isListening()) {
+					botones[i].setOpacity(0.5);
+					botones[i].setListening(false);
+				}
 			} else {
-				
-				if(!representacionNumerica.isVisible())
-					representacionNumerica.show();
-				
-				
-				representacionNumerica.setText(cuenta);
-				capaBotones.draw();
-
+				botones[i].setListening(true);
+				botones[i].setOpacity(1);
 			}
-
 		}
+
+		if (cuenta.texto == "nada") {
+
+			representacionNumerica.hide();
+			capaBotones.draw();
+
+		} else {
+			if (!representacionNumerica.isVisible())
+				representacionNumerica.show();
+
+			representacionNumerica.setText(cuenta.texto);
+			
+		}
+		
+		if (base != 0 && !imgBajarBase.isVisible()) {
+			imgBajarBase.show();
+		}
+		
+		if (base != bases.length -1 && !imgSubirBase.isVisible())
+		{
+			imgSubirBase.show();
+		}
+		
+		capaBotones.draw();
 
 	});
 
