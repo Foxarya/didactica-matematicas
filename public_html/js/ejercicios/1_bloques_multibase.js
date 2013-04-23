@@ -26,7 +26,13 @@ var posiciones = {
 		offset : {
 			x : 17,
 			y : 0
-		}
+		},
+		 spawn: {	 	
+		 	x1: 600,
+		 	y1: 70,
+		 	x2: 800,
+		 	y2:	350	 	
+		 }
 	},
 	barra : {
 		x : 480,
@@ -34,7 +40,14 @@ var posiciones = {
 		offset : {
 			x : 0,
 			y : 17
-		}
+		},
+		 spawn: {	 	
+		 	x1: 0,
+		 	y1: 0,
+		 	x2: 0,
+		 	y2:	0 	
+		 }
+
 	},
 	placa : {
 		x : 280,
@@ -42,7 +55,14 @@ var posiciones = {
 		offset : {
 			x : 8,
 			y : -17
-		}
+		},
+		 spawn: {	 	
+		 	x1: 0,
+		 	y1: 0,
+		 	x2: 0,
+		 	y2:	0	 	
+		 }
+
 	},
 	bloque : {
 		x : 5,
@@ -50,7 +70,14 @@ var posiciones = {
 		offset : {
 			x : 0,
 			y : 0
-		}
+		},
+		 spawn: {	 	
+		 	x1: 0,
+		 	y1: 0,
+		 	x2: 0,
+		 	y2:	0	 	
+		 }
+
 	}
 
 };
@@ -63,7 +90,7 @@ var limites = [15, 80, 255, 624, 1295, 4095, 9999, 20735];
 
 var dictImg = {};
 
-var base = 3;
+var base = 2;
 
 function tamaño() {
 	return {
