@@ -1,22 +1,10 @@
-var container;
-var padre;
-
-var escenario = new Kinetic.Stage({
-	container : 'container',
-	width : 500,
-	height : 400,
-	draggable : true,
-	dragBoundFunc : function(pos) {
-		return {
-			x : this.getAbsolutePosition().x,
-			y : this.getAbsolutePosition().y
-		}
-	}
-});
+var escenario;
 
 var capaBotones = new Kinetic.Layer();
 var capaCubos = new Kinetic.Layer();
 var capaPapelera = new Kinetic.Layer();
+
+var dictImg = {};
 
 var posiciones = {
 
@@ -61,73 +49,7 @@ var bases = [2, 3, 4, 5, 6, 8, 10, 12];
 
 var limites = [15, 80, 255, 624, 1295, 4095, 9999, 20735];
 
-var dictImg = {};
-
 var base = 3;
-
-function tamaño() {
-	return {
-		width : escenario.getWidth() / escenario.getScale().x,
-		height : escenario.getHeight() / escenario.getScale().y
-	}
-}
-
-function posicionRaton() {
-	return {
-		x : escenario.getPointerPosition().x / escenario.getScale().x,
-		y : escenario.getPointerPosition().y / escenario.getScale().y
-	}
-}
-
-function cargarImagenes() {
-
-	var barraCarga = new Kinetic.Rect({
-		x : tamaño().width / 2 - 250,
-		y : tamaño().height / 2,
-		width : 0,
-		height : 5,
-		stroke : 'black',
-		strokeWidth : 2,
-		fill : 'orange'
-
-	});
-
-	capaCubos.add(barraCarga);
-
-	$.ajax({
-		type : "GET",
-		url : "img/ejercicios/1_bloques_multibase/indice.xml",
-		dataType : "xml",
-		success : function(xml) {
-			var cargadas = 0;
-			var numeroImagenes = $(xml).find('imagen').length;
-			$(xml).find('imagen').each(function() {
-				var nombreImagen = $(this).text();
-				var imagen = new Image();
-
-				imagen.onload = function() {
-
-					dictImg[nombreImagen] = imagen;
-					cargadas++;
-					barraCarga.transitionTo({
-						width : ((cargadas * 100) / numeroImagenes) * 5,
-						duration : 0.1,
-						easing : 'ease-in-out'
-					});
-					barraCarga.draw();
-					if (cargadas == numeroImagenes) {
-						barraCarga.destroy();
-						logicaJuego();
-					}
-				};
-
-				imagen.src = "img/ejercicios/1_bloques_multibase/" + nombreImagen + ".png";
-
-			});
-		}
-	});
-
-}
 
 function cuentaRepresentados() {
 
@@ -240,28 +162,6 @@ function agrupar(elementos) {
 
 }
 
-function hayColision(elementoA, elementoB) {
-
-	var centroB = {
-		x : elementoB.getX() + (elementoB.getWidth() / 2),
-		y : elementoB.getY() + (elementoB.getHeight() / 2)
-	};
-
-	var mayorX = Math.max(elementoA.getX(), elementoA.getX() + elementoA.getWidth());
-	var mayorY = Math.max(elementoA.getY(), elementoA.getY() + elementoA.getHeight());
-	var menorX = Math.min(elementoA.getX(), elementoA.getX() + elementoA.getWidth());
-	var menorY = Math.min(elementoA.getY(), elementoA.getY() + elementoA.getHeight());
-
-	if ((centroB.x > menorX && centroB.x < mayorX) && (centroB.y > menorY && centroB.y < mayorY)) {
-
-		return true;
-
-	}
-
-	return false;
-
-}
-
 function Elemento(x, y, tipo) {
 
 	this.x = x;
@@ -298,7 +198,6 @@ function Elemento(x, y, tipo) {
 				var desagrupado = new Elemento(kineticImage.getX(), kineticImage.getY() + offsetY, siguientes);
 				capaCubos.add(desagrupado);
 				offsetY += 30;
-
 			}
 			kineticImage.destroy();
 			capaCubos.draw();
@@ -360,214 +259,25 @@ function Elemento(x, y, tipo) {
 
 }
 
-function Boton(x, y, ancho, alto, contenido, onclick, ondrag) {
-
-	var boton;
-	var draggable = (ondrag != null) ? true : false;
-
-	if ( contenido instanceof Image) {
-		boton = new Kinetic.Image({
-			x : x,
-			y : y,
-			image : contenido,
-			width : ancho,
-			heigth : alto,
-			draggable : draggable,
-			dragBoundFunc : function(pos) {
-				return {
-					x : this.getAbsolutePosition().x,
-					y : this.getAbsolutePosition().y
-				}
-			}
-		});
-
-	} else {
-		boton = new Kinetic.Label({
-			x : x,
-			y : y,
-			opacity : 1,
-			width : ancho,
-			listening : true,
-			text : {
-				text : contenido,
-				fontSize : 12,
-				fontFamily : 'Calibri',
-				fill : '#555',
-				padding : 20,
-				align : 'center'
-			},
-			rect : {
-				stroke : '#555',
-				strokeWidth : 5,
-				fill : '#ddd',
-				shadowColor : 'black',
-				shadowBlur : 10,
-				shadowOffset : [10, 10],
-				shadowOpacity : 0.2,
-				cornerRadius : 10
-			}
-		});
-
-	}
-
-	boton.on('mouseover', function() {
-		document.body.style.cursor = 'pointer';
-	});
-	boton.on('mouseout', function() {
-		document.body.style.cursor = 'default';
-	});
-
-	boton.on('click tap', onclick);
-
-	if (draggable)
-		boton.on('dragstart', ondrag);
-
-	return boton;
-
-}
-
 
 $(document).ready(function() {
-	container = $('#container');
-	padre = $(container).parent();
-	var resolucionOriginal = {
-		ancho : 1026,
-		alto : escenario.getHeight(),
-		relacion : 1026 / escenario.getHeight()
-	};
-	escenario.add(capaPapelera);
-	escenario.add(capaCubos);
-	escenario.add(capaBotones);
 
-	$(window).resize(function() {
-
-		container.attr('width', $(padre).width());
-		container.attr('height', $(padre).width() / resolucionOriginal.relacion);
-		escenario.setWidth($(padre).width());
-		escenario.setHeight($(padre).width() / resolucionOriginal.relacion);
-		escenario.setScale($(padre).width() / 1026, $(padre).width() / 1026);
-
+	escenario = new MathCanvas.Engine({
+		alto: 400,
+		urlImagenes: "img/ejercicios/1_bloques_multibase/",
+		callback: logicaJuego
 	});
 
-	$(window).resize();
-
-	container.on("mouseout", function() {
-		if (escenario.isDragging()) {
-			escenario.stopDrag();
-			seleccion.rect.destroy();
-			capaCubos.draw();
-			seleccion.rect = null;
-		}
-	});
-
-	cargarImagenes();
-
-	var seleccion = {
-		rect : null,
-		origenX : 0,
-		origenY : 0,
-		finalX : 1,
-		finalY : 1
-	}
-
-	escenario.on('dragstart', function(evt) {
-
-		if (seleccion.rect != null) {
-			seleccion.rect.destroy();
-			capaCubos.draw();
-			seleccion.rect = null;
-		}
-
-		if (!evt.targetNode) {
-			seleccion.rect = new Kinetic.Rect({
-				x : posicionRaton().x,
-				y : posicionRaton().y,
-				width : 1,
-				height : 1,
-				stroke : '#000',
-				strokeWidth : 2,
-				fill : '#ddd',
-				opacity : 0.5
-			});
-
-			seleccion.origenX = seleccion.rect.getX();
-			seleccion.origenY = seleccion.rect.getY();
-
-			capaCubos.add(seleccion.rect);
-			seleccion.rect.draw();
-		}
-	});
-
-	escenario.on('dragmove', function() {
-
-		if (seleccion.rect != null) {
-			seleccion.rect.setWidth(posicionRaton().x - seleccion.rect.getX());
-			seleccion.rect.setHeight(posicionRaton().y - seleccion.rect.getY());
-		}
-
-	});
-
-	escenario.on('dragend', function() {
-		if (seleccion.rect != null) {
-			seleccion.finalX = posicionRaton().x;
-			seleccion.finalY = posicionRaton().y;
-
-			var seleccionados = new Kinetic.Collection();
-			var seleccionadoElementoDistinto = false;
-
-			for (var i = 0; i < capaCubos.getChildren().length; i++) {
-
-				var cubo = capaCubos.getChildren()[i];
-
-				if ( cubo instanceof Kinetic.Rect || cubo.getName() == "bloque") {
-					continue;
-				}
-
-				/*var mayorX = Math.max(seleccion.origenX, seleccion.finalX);
-				 var mayorY = Math.max(seleccion.origenY, seleccion.finalY);
-				 var menorX = Math.min(seleccion.origenX, seleccion.finalX);
-				 var menorY = Math.min(seleccion.origenY, seleccion.finalY);
-
-				 if ((cubo.getX() > menorX && cubo.getX() + cubo.getWidth() < mayorX) && (cubo.getY() > menorY && cubo.getY() + cubo.getHeight() < mayorY)) {
-				 seleccionados.push(cubo);
-				 /*cubo.applyFilter(Kinetic.Filters.Grayscale, null, function() {
-				 capaCubos.draw();
-				 });
-				 if (seleccionados[0].getName() != cubo.getName()) {
-				 seleccionadoElementoDistinto = true;
-				 break;
-				 }
-				 }*/
-
-				if (hayColision(seleccion.rect, cubo)) {
-					seleccionados.push(cubo);
-					/*cubo.applyFilter(Kinetic.Filters.Grayscale, null, function() {
-					 capaCubos.draw();
-					 });*/
-					if (seleccionados[0].getName() != cubo.getName()) {
-						seleccionadoElementoDistinto = true;
-						break;
-					}
-				}
-
-			}
-
-			if (seleccionados.length >= bases[base] && !seleccionadoElementoDistinto) {
-
-				agrupar(seleccionados);
-			}
-
-			seleccion.rect.destroy();
-			capaCubos.draw();
-			seleccion.rect = null;
-		}
-	});
-
+	
+		
+	
 });
 
-function logicaJuego() {
+function logicaJuego(engdictImg) {
+	
+	dictImg = engdictImg;
 
-	var imgBotonCubo = new Boton(866, 80, 50, 50, dictImg["icono_cubo"], function() {
+	var imgBotonCubo = new MathCanvas.Boton(866, 80, 50, 50, dictImg["icono_cubo"], function() {
 		var cubo = new Elemento(posiciones.cubo.x, posiciones.cubo.y, "cubo");
 
 		capaCubos.add(cubo);
@@ -581,7 +291,7 @@ function logicaJuego() {
 
 	});
 
-	var imgBotonBarras = new Boton(610, 80, 100, 100, dictImg["icono_barra"], function() {
+	var imgBotonBarras = new MathCanvas.Boton(610, 80, 100, 100, dictImg["icono_barra"], function() {
 
 		var barra = new Elemento(posiciones.barra.x, posiciones.barra.y, "barra");
 
@@ -597,7 +307,7 @@ function logicaJuego() {
 
 	});
 
-	var imgBotonPlacas = new Boton(354, 78, 100, 100, dictImg["icono_placa"], function() {
+	var imgBotonPlacas = new MathCanvas.Boton(354, 78, 100, 100, dictImg["icono_placa"], function() {
 
 		var placa = new Elemento(posiciones.placa.x, posiciones.placa.y, "placa");
 
@@ -613,7 +323,7 @@ function logicaJuego() {
 
 	});
 
-	var imgBotonBloques = new Boton(95, 60, 100, 100, dictImg["icono_bloque"], function() {
+	var imgBotonBloques = new MathCanvas.Boton(95, 60, 100, 100, dictImg["icono_bloque"], function() {
 
 		var bloque = new Elemento(posiciones.bloque.x, posiciones.bloque.y, "bloque");
 
@@ -635,28 +345,17 @@ function logicaJuego() {
 
 	});
 
-	var botonLimpiar = new Boton(950, 340, 32, 32, dictImg["icono_papelera"], function() {
-
-		posiciones.cubo.offsetX = 60;
-		posiciones.cubo.offsetY = 60;
-
-		posiciones.barra.offsetX = 60;
-		posiciones.barra.offsetX = 60;
-
-		posiciones.placa.offsetX = 60;
-		posiciones.placa.offsetX = 60;
-
-		posiciones.bloque.offsetX = 60;
-		posiciones.bloque.offsetX = 60;
+	var botonLimpiar = new MathCanvas.Boton(950, 340, 32, 32, dictImg["icono_papelera"], function() {
 
 		capaCubos.removeChildren();
 		capaCubos.draw();
+		
 	});
 
 	botonLimpiar.setId("papelera");
 
 	var representacionNumerica = new Kinetic.Text({
-		x : tamaño().width / 2,
+		x : escenario.tamaño().width / 2,
 		y : 15,
 		text : '0 0 0 0 ',
 		fontSize : 30,
@@ -664,7 +363,7 @@ function logicaJuego() {
 		fill : 'black'
 	});
 	var representacionBase = new Kinetic.Text({
-		x : tamaño().width / 2,
+		x : escenario.tamaño().width / 2,
 		y : 47,
 		text : 'Base ' + bases[base],
 		fontSize : 18,
@@ -677,7 +376,7 @@ function logicaJuego() {
 	representacionNumerica.setX((tamaño().width / 2) - (representacionNumerica.getWidth() / 2));
 	representacionBase.setX((tamaño().width / 2) - (representacionBase.getWidth() / 2));
 
-	var imgSubirBase = new Boton(representacionBase.getX() + representacionBase.getWidth() + 20, 45, 24, 24, dictImg["subirBase"], function() {
+	var imgSubirBase = new MathCanvas.Boton(representacionBase.getX() + representacionBase.getWidth() + 20, 45, 24, 24, dictImg["subirBase"], function() {
 
 		if (base != bases.length - 1) {
 			base++;
@@ -696,7 +395,7 @@ function logicaJuego() {
 
 	});
 
-	var imgBajarBase = new Boton(representacionBase.getX() - 40, 45, 24, 24, dictImg["bajarBase"], function() {
+	var imgBajarBase = new MathCanvas.Boton(representacionBase.getX() - 40, 45, 24, 24, dictImg["bajarBase"], function() {
 
 		if (base != 0) {
 			base--;
