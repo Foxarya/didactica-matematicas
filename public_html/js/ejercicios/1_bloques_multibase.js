@@ -564,7 +564,7 @@ $(document).ready(function() {
 	});
 
 });
-
+	
 function logicaJuego() {
 
 	var imgBotonCubo = new Boton(866, 80, 50, 50, dictImg["icono_cubo"], function() {
