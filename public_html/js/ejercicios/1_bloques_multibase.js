@@ -4,7 +4,7 @@ var padre;
 var escenario = new Kinetic.Stage({
 	container : 'container',
 	width : 500,
-	height : 400,
+	height : 575,
 	draggable : true,
 	dragBoundFunc : function(pos) {
 		return {
@@ -635,22 +635,33 @@ function logicaJuego() {
 
 	});
 
-	var botonLimpiar = new Boton(950, 340, 32, 32, dictImg["icono_papelera"], function() {
+	var botonLimpiar = new Boton(950, 490, 32, 32, dictImg["icono_papelera"], function() {
 
-		posiciones.cubo.offsetX = 60;
-		posiciones.cubo.offsetY = 60;
-
-		posiciones.barra.offsetX = 60;
-		posiciones.barra.offsetX = 60;
-
-		posiciones.placa.offsetX = 60;
-		posiciones.placa.offsetX = 60;
-
-		posiciones.bloque.offsetX = 60;
-		posiciones.bloque.offsetX = 60;
-
-		capaCubos.removeChildren();
-		capaCubos.draw();
+		var borradas = 0;
+		for(var i = 0; i < capaCubos.getChildren().length; i++)
+		{
+			var elemento = capaCubos.getChildren()[i];
+			elemento.transitionTo({
+				x: this.getX(),
+				y: this.getY(),
+				opacity: 0.5,
+				scale: {
+					x: 0.5,
+					y: 0.5
+				},
+				duration: 0.5,
+				easing: 'back-ease-in',
+				callback: function() {
+					borradas++;
+					if(borradas == capaCubos.getChildren().length)
+					{
+						capaCubos.removeChildren();
+						capaCubos.draw();
+					}
+				}
+			});
+		}
+		
 	});
 
 	botonLimpiar.setId("papelera");
