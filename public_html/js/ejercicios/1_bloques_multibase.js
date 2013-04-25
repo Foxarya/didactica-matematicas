@@ -61,6 +61,8 @@ var bases = [2, 3, 4, 5, 6, 8, 10, 12];
 
 var limites = [15, 80, 255, 624, 1295, 4095, 9999, 20735];
 
+var contar = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, "A", "B", "C", "D", "F"];
+
 var dictImg = {};
 
 var base = 3;
@@ -131,111 +133,154 @@ function cargarImagenes() {
 
 function cuentaRepresentados() {
 
-	var numero = 0;
+	var cantidades = [];
 	var devolver = "";
-	var multi = 1000;
-	var numbase10 = 0;
+	var base10 = 0;
 
-	var id = ["bloque", "placa", "barra", "cubo"];
 	var contador = 3;
-	for (var i = 0; i < id.length; i++) {
-		var elementos = capaCubos.get("." + id[i]);
-		if (elementos.length >= bases[base] || elementos.length > 9) {
+	for (var i = 0; i < prioridad.length; i++) {
+		var elementos = capaCubos.get("." + prioridad[i]).length;
+		if (elementos >= bases[base]) {
 			devolver = "nada";
-			numero += 9 * multi;
 		}
 
-		if (elementos.length != 0) {
-			numero += elementos.length * multi;
+		if (elementos != 0) {
+			cantidades[i] = contar[elementos];
+		} else {
+			cantidades[i] = 0;
 		}
-		numbase10 += elementos.length * Math.pow(bases[base], contador);
+		base10 += elementos * Math.pow(bases[base], contador);
 		contador--;
 
-		multi /= 10;
 	}
 	if (devolver != "nada") {
 		var contador = 0;
-		for (var i = 4; i >= 0; i--) {
-			if (numero.toString().length < i) {
-				devolver += "0 ";
-			} else {
+		for (var i = 0; i < cantidades.length; i++) {
 
-				devolver += numero.toString().charAt(contador) + " ";
-				contador++;
-
-			}
+			devolver += cantidades[i] + " ";
 
 		}
 	}
 
 	return {
-		integer : numero,
 		texto : devolver,
-		base10 : numbase10
+		base10 : base10
 	};
 
 }
 
 function agrupar(elementos) {
-	var coordenadas = {
-		x : elementos[0].getX(),
-		y : elementos[0].getY()
-	};
-	var offset = {
-		x : 0,
-		y : 0
-	};
+
+	if (elementos.length < bases[base]) {
+		return;
+	}
+
+	var grupos = [];
+	var cogidos = [];
+	var tipo = prioridad.indexOf(elementos[0].getName());
 
 	for (var i = 0; i < elementos.length - (elementos.length % bases[base]); i++) {
-		var elemento = elementos[i];
 
-		var tipo;
-		if (i == 0)
-			tipo = prioridad.indexOf(elemento.getName());
+		if (cogidos.indexOf(i) != -1)
+			continue;
 
-		if (i + 1 == elementos.length - (elementos.length % bases[base])) {
-			elemento.moveToBottom();
+		var elemento = elementos[0];
+		var distancias = [];
+		var grupo = new Kinetic.Collection();
+
+		for (var j = 0; j < elementos.length - (elementos.length % bases[base]); j++) {
+
+			var distancia = {
+				x : elemento.getX() - elementos[j].getX(),
+				y : elemento.getY() - elementos[j].getY()
+			};
+
+			if (cogidos.indexOf(j) != -1)
+				continue;
+
+			//Teorema de Pitágoras
+			distancias.push({
+				distancia : Math.sqrt(Math.pow(distancia.x, 2) + Math.pow(distancia.y, 2)),
+				indice : j
+			});
+
+		}
+
+		distancias.sort(function(a, b) {
+			if (a.distancia < b.distancia)
+				return -1;
+			if (a.distancia > b.distancia)
+				return 1;
+			return 0;
+		});
+
+		for (var coger = 0; coger < bases[base]; coger++) {
+
+			cogidos.push(distancias[coger].indice);
+
+			grupo.push(elementos[distancias[coger].indice]);
+
+		}
+
+		grupos.push(grupo);
+
+	}
+	var agrupados = 0;
+	var coordenadas = [];
+	for (var i = 0; i < grupos.length; i++) {
+
+		coordenadas.push({
+			x : grupos[i][0].getX(),
+			y : grupos[i][0].getY()
+		});
+
+		grupos[i].each(function(elemento) {
+
 			elemento.transitionTo({
-				x : coordenadas.x + offset.x,
-				y : coordenadas.y + offset.y,
-				duration : 1,
-				easing : 'ease-in-out',
+				x : grupos[i][0].getX(),
+				y : grupos[i][0].getY(),
+				scale : {
+					x : 0.5,
+					y : 0.5
+				},
+				duration : 0.3,
+				easing : 'strong-ease-in',
 				callback : function() {
 
-					for (var i = 0; i < elementos.length - (elementos.length % bases[base]); i++) {
-						var elemento = elementos[i];
+					agrupados++;
 
-						elemento.destroy();
+					if (agrupados == bases[base] * grupos.length) {
 
-						if (i % bases[base] == 0) {
-							var siguiente = new Elemento(coordenadas.x, coordenadas.y, prioridad[tipo - 1]);
+						var numeroNuevosElementos = grupos.length;
+
+						for (var z = 0; z < grupos.length; z++) {
+							grupos[z].each(function(elemento) {
+								elemento.destroy();
+							});
+						}
+						for (var n = 0; n < numeroNuevosElementos; n++) {
+							var siguiente = new Elemento(coordenadas[n].x, coordenadas[n].y, prioridad[tipo - 1]);
+
+							siguiente.setScale(0);
 
 							capaCubos.add(siguiente);
-							siguiente.draw();
-							coordenadas.x = elementos[i + 1].getX();
-							coordenadas.y = elementos[i + 1].getY();
+							capaCubos.draw();
+
+							siguiente.transitionTo({
+								scale : {
+									x : 1,
+									y : 1
+								},
+								duration : 0.5,
+								easing : 'strong-ease-out'
+							});
 						}
 
 					}
+
 				}
 			});
-		} else {
-			elemento.moveUp();
-			elemento.transitionTo({
-				x : coordenadas.x + offset.x,
-				y : coordenadas.y + offset.y,
-				duration : 1,
-				easing : 'ease-in-out'
-			});
-			offset.x += posiciones[elemento.getName()].offset.x;
-			offset.y += posiciones[elemento.getName()].offset.y;
-
-		}
-
-		if (i + 1 % bases[base] == 0) {
-			offset.y += 20;
-		}
-
+		});
 	}
 
 }
@@ -271,50 +316,94 @@ function Elemento(x, y, tipo) {
 	var imagen = (tipo == "cubo") ? dictImg["cubo"] : dictImg[tipo + "_base" + bases[base]];
 
 	var kineticImage = new Kinetic.Image({
-		x : this.x,
-		y : this.y,
+		x : -(imagen.width / 2),
+		y : -(imagen.height / 2),
 		image : imagen,
 		width : imagen.width,
-		height : imagen.height,
+		height : imagen.height
+	});
+
+	var grupo = new Kinetic.Group({
+		x : x,
+		y : y,
+		width : kineticImage.getWidth(),
+		height : kineticImage.getHeight(),
 		draggable : true,
 		name : tipo
 	});
 
+	grupo.add(kineticImage);
+
 	kineticImage.createImageHitRegion();
 
-	kineticImage.on('mouseover', function() {
+	grupo.on('mouseover', function() {
 		document.body.style.cursor = 'pointer';
 	});
-	kineticImage.on('mouseout', function() {
+	grupo.on('mouseout', function() {
 		document.body.style.cursor = 'default';
 	});
 
-	kineticImage.on('dblclick dbltap', function() {
+	grupo.on('dblclick dbltap', function() {
 
 		if (tipo != "cubo") {
-			var siguientes = prioridad[prioridad.indexOf(tipo) + 1];
-			var offsetY = 0;
-			for (var i = 0; i < bases[base]; i++) {
-				var desagrupado = new Elemento(kineticImage.getX(), kineticImage.getY() + offsetY, siguientes);
-				capaCubos.add(desagrupado);
-				offsetY += 30;
 
-			}
-			kineticImage.destroy();
-			capaCubos.draw();
+			grupo.transitionTo({
+				scale : {
+					x : 0.5,
+					y : 0.5
+				},
+				duration : 0.3,
+				easing : 'strong-ease-in',
+				callback : function() {
+					
+					
+					var siguientes = prioridad[prioridad.indexOf(tipo) + 1];
+					var nombreImagenSiguientes = (siguientes == "cubo") ? "cubo" : siguientes + "_base" + bases[base];
+					var separacion = 5;
+					var offset = {
+						x: 0,
+						y: -((dictImg[nombreImagenSiguientes].height * bases[base] + separacion * bases[base]) / 2)
+					};
+					
+					for (var i = 0; i < bases[base]; i++) {
+						var desagrupado = new Elemento(grupo.getX() + offset.x, grupo.getY() + offset.y, siguientes);
+						desagrupado.setScale(0);
+						capaCubos.add(desagrupado);
+						desagrupado.transitionTo({
+							scale: {
+								x: 1,
+								y: 1
+							},
+							duration: 0.5,
+							easing: 'strong-ease-out'
+						});
+						offset.y += desagrupado.getHeight() + separacion;
+						if(offset.y > tamaño.height)
+						{
+							offset.y = -((dictImg[siguientes + "_base"+bases[base]].height * bases[base] + separacion * bases[base]) / 2);
+							offset.x += grupo.getWidth();
+						}
+
+					}
+					grupo.destroy();
+					capaCubos.draw();
+					
+				}
+			});
+
 		}
 
 	});
 
 	var papelera = capaPapelera.get("#papelera")[0];
 
-	kineticImage.on('dragstart', function() {
-		kineticImage.moveToTop();
+	grupo.on('dragstart', function() {
+		grupo.moveToTop();
 	});
 
-	kineticImage.on('dragmove', function() {
-		if (hayColision(kineticImage, papelera)) {
-			kineticImage.transitionTo({
+	grupo.on('dragmove', function() {
+		if (hayColision(grupo, papelera)) {
+			grupo.transitionTo({
 				opacity : 0.6,
 				scale : {
 					x : 0.9,
@@ -323,8 +412,8 @@ function Elemento(x, y, tipo) {
 				duration : 0.2,
 				easing : 'strong-ease-in'
 			});
-		} else if (kineticImage.getOpacity() != 1) {
-			kineticImage.transitionTo({
+		} else if (grupo.getOpacity() != 1) {
+			grupo.transitionTo({
 				opacity : 1,
 				scale : {
 					x : 1,
@@ -336,9 +425,9 @@ function Elemento(x, y, tipo) {
 		}
 	});
 
-	kineticImage.on('dragend', function() {
-		if (hayColision(kineticImage, papelera)) {
-			kineticImage.transitionTo({
+	grupo.on('dragend', function() {
+		if (hayColision(grupo, papelera)) {
+			grupo.transitionTo({
 				x : papelera.getX(),
 				y : papelera.getY(),
 				scale : {
@@ -348,7 +437,7 @@ function Elemento(x, y, tipo) {
 				duration : 0.3,
 				easing : 'back-ease-in',
 				callback : function() {
-					kineticImage.destroy();
+					grupo.destroy();
 					capaCubos.draw();
 				}
 			});
@@ -356,7 +445,7 @@ function Elemento(x, y, tipo) {
 		}
 	});
 
-	return kineticImage;
+	return grupo;
 
 }
 
@@ -364,11 +453,12 @@ function Boton(x, y, ancho, alto, contenido, onclick, ondrag) {
 
 	var boton;
 	var draggable = (ondrag != null) ? true : false;
+	var grupo;
 
 	if ( contenido instanceof Image) {
 		boton = new Kinetic.Image({
-			x : x,
-			y : y,
+			x : -(contenido.width / 2),
+			y : -(contenido.height / 2),
 			image : contenido,
 			width : ancho,
 			heigth : alto,
@@ -383,8 +473,8 @@ function Boton(x, y, ancho, alto, contenido, onclick, ondrag) {
 
 	} else {
 		boton = new Kinetic.Label({
-			x : x,
-			y : y,
+			x : 0,
+			y : 0,
 			opacity : 1,
 			width : ancho,
 			listening : true,
@@ -408,21 +498,40 @@ function Boton(x, y, ancho, alto, contenido, onclick, ondrag) {
 			}
 		});
 
+		boton.setX(-(boton.getWidth() / 2));
+		boton.setY(-(boton.getHeight() / 2));
+
 	}
 
-	boton.on('mouseover', function() {
+	grupo = new Kinetic.Group({
+		x : x,
+		y : y,
+		width : boton.getWidth(),
+		height : boton.getHeight(),
+		draggable : draggable,
+		dragBoundFunc : function(pos) {
+			return {
+				x : this.getAbsolutePosition().x,
+				y : this.getAbsolutePosition().y
+			}
+		}
+	});
+
+	grupo.add(boton);
+
+	grupo.on('mouseover', function() {
 		document.body.style.cursor = 'pointer';
 	});
-	boton.on('mouseout', function() {
+	grupo.on('mouseout', function() {
 		document.body.style.cursor = 'default';
 	});
 
-	boton.on('click tap', onclick);
+	grupo.on('click tap', onclick);
 
 	if (draggable)
-		boton.on('dragstart', ondrag);
+		grupo.on('dragstart', ondrag);
 
-	return boton;
+	return grupo;
 
 }
 
@@ -523,27 +632,8 @@ $(document).ready(function() {
 					continue;
 				}
 
-				/*var mayorX = Math.max(seleccion.origenX, seleccion.finalX);
-				 var mayorY = Math.max(seleccion.origenY, seleccion.finalY);
-				 var menorX = Math.min(seleccion.origenX, seleccion.finalX);
-				 var menorY = Math.min(seleccion.origenY, seleccion.finalY);
-
-				 if ((cubo.getX() > menorX && cubo.getX() + cubo.getWidth() < mayorX) && (cubo.getY() > menorY && cubo.getY() + cubo.getHeight() < mayorY)) {
-				 seleccionados.push(cubo);
-				 /*cubo.applyFilter(Kinetic.Filters.Grayscale, null, function() {
-				 capaCubos.draw();
-				 });
-				 if (seleccionados[0].getName() != cubo.getName()) {
-				 seleccionadoElementoDistinto = true;
-				 break;
-				 }
-				 }*/
-
 				if (hayColision(seleccion.rect, cubo)) {
 					seleccionados.push(cubo);
-					/*cubo.applyFilter(Kinetic.Filters.Grayscale, null, function() {
-					 capaCubos.draw();
-					 });*/
 					if (seleccionados[0].getName() != cubo.getName()) {
 						seleccionadoElementoDistinto = true;
 						break;
@@ -564,24 +654,24 @@ $(document).ready(function() {
 	});
 
 });
-	
+
 function logicaJuego() {
 
-	var imgBotonCubo = new Boton(866, 80, 50, 50, dictImg["icono_cubo"], function() {
-		var cubo = new Elemento(posiciones.cubo.x, posiciones.cubo.y, "cubo");
+	var imgBotonCubo = new Boton(891, 130, 50, 50, dictImg["icono_cubo"], function() {
+		var cubo = new Elemento(this.getX(), this.getY() + 200, "cubo");
 
 		capaCubos.add(cubo);
 
 		cubo.draw();
 	}, function() {
 
-		var cubo = new Elemento(posicionRaton().x - (dictImg["cubo"].width / 2), posicionRaton().y - (dictImg["cubo"].height / 2), "cubo");
+		var cubo = new Elemento(posicionRaton().x, posicionRaton().y, "cubo");
 		capaCubos.add(cubo);
 		cubo.startDrag();
 
 	});
 
-	var imgBotonBarras = new Boton(610, 80, 100, 100, dictImg["icono_barra"], function() {
+	var imgBotonBarras = new Boton(660, 130, 100, 100, dictImg["icono_barra"], function() {
 
 		var barra = new Elemento(posiciones.barra.x, posiciones.barra.y, "barra");
 
@@ -591,13 +681,13 @@ function logicaJuego() {
 
 	}, function() {
 
-		var barra = new Elemento(posicionRaton().x - (dictImg["barra_base" + bases[base]].width / 2), posicionRaton().y - (dictImg["barra_base" + bases[base]].height / 2), "barra");
+		var barra = new Elemento(posicionRaton().x, posicionRaton().y, "barra");
 		capaCubos.add(barra);
 		barra.startDrag();
 
 	});
 
-	var imgBotonPlacas = new Boton(354, 78, 100, 100, dictImg["icono_placa"], function() {
+	var imgBotonPlacas = new Boton(404, 130, 100, 100, dictImg["icono_placa"], function() {
 
 		var placa = new Elemento(posiciones.placa.x, posiciones.placa.y, "placa");
 
@@ -607,13 +697,13 @@ function logicaJuego() {
 
 	}, function() {
 
-		var placa = new Elemento(posicionRaton().x - (dictImg["placa_base" + bases[base]].width / 2), posicionRaton().y - (dictImg["placa_base" + bases[base]].height / 2), "placa");
+		var placa = new Elemento(posicionRaton().x, posicionRaton().y, "placa");
 		capaCubos.add(placa);
 		placa.startDrag();
 
 	});
 
-	var imgBotonBloques = new Boton(95, 60, 100, 100, dictImg["icono_bloque"], function() {
+	var imgBotonBloques = new Boton(145, 130, 100, 100, dictImg["icono_bloque"], function() {
 
 		var bloque = new Elemento(posiciones.bloque.x, posiciones.bloque.y, "bloque");
 
@@ -629,39 +719,37 @@ function logicaJuego() {
 
 	}, function() {
 
-		var bloque = new Elemento(posicionRaton().x - (dictImg["bloque_base" + bases[base]].width / 2), posicionRaton().y - (dictImg["bloque_base" + bases[base]].height / 2), "bloque");
+		var bloque = new Elemento(posicionRaton().x, posicionRaton().y, "bloque");
 		capaCubos.add(bloque);
 		bloque.startDrag();
 
 	});
 
-	var botonLimpiar = new Boton(950, 490, 32, 32, dictImg["icono_papelera"], function() {
+	var botonLimpiar = new Boton(966, 506, 32, 32, dictImg["icono_papelera"], function() {
 
 		var borradas = 0;
-		for(var i = 0; i < capaCubos.getChildren().length; i++)
-		{
+		for (var i = 0; i < capaCubos.getChildren().length; i++) {
 			var elemento = capaCubos.getChildren()[i];
 			elemento.transitionTo({
-				x: this.getX(),
-				y: this.getY(),
-				opacity: 0.5,
-				scale: {
-					x: 0.5,
-					y: 0.5
+				x : this.getX(),
+				y : this.getY(),
+				opacity : 0.0,
+				scale : {
+					x : 0.5,
+					y : 0.5
 				},
-				duration: 0.5,
-				easing: 'back-ease-in',
-				callback: function() {
+				duration : 0.3,
+				easing : 'strong-ease-out',
+				callback : function() {
 					borradas++;
-					if(borradas == capaCubos.getChildren().length)
-					{
+					if (borradas == capaCubos.getChildren().length) {
 						capaCubos.removeChildren();
 						capaCubos.draw();
 					}
 				}
 			});
 		}
-		
+
 	});
 
 	botonLimpiar.setId("papelera");
@@ -688,7 +776,7 @@ function logicaJuego() {
 	representacionNumerica.setX((tamaño().width / 2) - (representacionNumerica.getWidth() / 2));
 	representacionBase.setX((tamaño().width / 2) - (representacionBase.getWidth() / 2));
 
-	var imgSubirBase = new Boton(representacionBase.getX() + representacionBase.getWidth() + 20, 45, 24, 24, dictImg["subirBase"], function() {
+	var imgSubirBase = new Boton(representacionBase.getX() + representacionBase.getWidth() + 32, 57, 24, 24, dictImg["subirBase"], function() {
 
 		if (base != bases.length - 1) {
 			base++;
@@ -707,7 +795,7 @@ function logicaJuego() {
 
 	});
 
-	var imgBajarBase = new Boton(representacionBase.getX() - 40, 45, 24, 24, dictImg["bajarBase"], function() {
+	var imgBajarBase = new Boton(representacionBase.getX() - 28, 57, 24, 24, dictImg["bajarBase"], function() {
 
 		if (base != 0) {
 			base--;
