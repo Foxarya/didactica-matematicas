@@ -163,6 +163,7 @@ function cuentaRepresentados() {
 	}
 
 	return {
+		
 		texto : devolver,
 		base10 : base10
 	};
@@ -225,6 +226,7 @@ function agrupar(elementos) {
 		grupos.push(grupo);
 
 	}
+	
 	var agrupados = 0;
 	var coordenadas = [];
 	for (var i = 0; i < grupos.length; i++) {
@@ -733,12 +735,12 @@ function logicaJuego() {
 			elemento.transitionTo({
 				x : this.getX(),
 				y : this.getY(),
-				opacity : 0.0,
+				opacity : 0.1,
 				scale : {
 					x : 0.5,
 					y : 0.5
 				},
-				duration : 0.3,
+				duration : 1,
 				easing : 'strong-ease-out',
 				callback : function() {
 					borradas++;
