@@ -184,7 +184,7 @@ function agrupar(elementos) {
 		if (cogidos.indexOf(i) != -1)
 			continue;
 
-		var elemento = elementos[0];
+		var elemento = elementos[i];
 		var distancias = [];
 		var grupo = new Kinetic.Collection();
 
