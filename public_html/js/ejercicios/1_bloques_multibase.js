@@ -16,7 +16,7 @@ var escenario = new Kinetic.Stage({
 
 var capaBotones = new Kinetic.Layer();
 var capaCubos = new Kinetic.Layer();
-var capaPapelera = new Kinetic.Layer();
+var capaVarios = new Kinetic.Layer();
 
 var borrando = false;
 
@@ -428,7 +428,7 @@ function Elemento(x, y, tipo) {
 
 	});
 
-	var papelera = capaPapelera.get("#papelera")[0];
+	var papelera = capaVarios.get("#papelera")[0];
 
 	grupo.on('dragstart', function() {
 		grupo.moveToTop();
@@ -592,7 +592,7 @@ $(document).ready(function() {
 		alto : escenario.getHeight(),
 		relacion : 1026 / escenario.getHeight()
 	};
-	escenario.add(capaPapelera);
+	escenario.add(capaVarios);
 	escenario.add(capaCubos);
 	escenario.add(capaBotones);
 
@@ -830,7 +830,6 @@ function logicaJuego() {
 
 	representacionNumerica.setId("numero");
 
-	
 	representacionBase.setX((tamaño().width / 2) - (representacionBase.getWidth() / 2));
 
 	var imgSubirBase = new Boton(representacionBase.getX() + representacionBase.getWidth() + 32, 57, 24, 24, dictImg["subirBase"], function() {
@@ -928,7 +927,7 @@ function logicaJuego() {
 	capaBotones.add(representacionNumerica);
 	capaBotones.add(representacionBase);
 
-	capaPapelera.add(botonLimpiar);
+	capaVarios.add(botonLimpiar);
 
 	capaBotones.add(imgBotonCubo);
 
@@ -937,6 +936,40 @@ function logicaJuego() {
 	capaBotones.add(imgBotonPlacas);
 
 	capaBotones.add(imgBotonBloques);
+
+	var consejosMostrados = {
+		colocarNuevoElemento : false
+	};
+
+	/*var consejos = new Kinetic.Animation(function(frame) {
+		var time = frame.time / 1000, timeDiff = frame.timeDiff / 1000, frameRate = frame.frameRate;
+		if (frame.time > 4 && !consejosMostrados.colocarNuevoElemento) {
+			consejosMostrados.colocarNuevoElemento = true;
+			var consejo = new Kinetic.Label({
+				x : 891,
+				y : 130,
+				opacity : 1,
+				listening : false,
+				text : {
+					text : 'Pulsa o arrastra para sacar un nuevo elemento',
+					fontFamily : 'Calibri',
+					fontSize : 18,
+					padding : 5,
+					fill : 'white'
+				},
+				rect : {
+					fill : 'green',
+					pointerDirection : 'up',
+					pointerWidth : 20,
+					pointerHeight : 28,
+					lineJoin : 'round',
+				}
+			});
+		}
+
+	}, capaBotones);
+
+	consejos.start();*/
 
 	capaCubos.on('draw', function() {
 
@@ -985,7 +1018,7 @@ function logicaJuego() {
 		if (base != bases.length - 1 && !imgSubirBase.isVisible()) {
 			imgSubirBase.show();
 		}
-		
+
 		representacionNumerica.setX((tamaño().width / 2) - (representacionNumerica.getWidth() / 2));
 		capaBotones.draw();
 
@@ -993,5 +1026,5 @@ function logicaJuego() {
 
 	capaBotones.draw();
 	capaCubos.draw();
-	capaPapelera.draw();
+	capaVarios.draw();
 }
