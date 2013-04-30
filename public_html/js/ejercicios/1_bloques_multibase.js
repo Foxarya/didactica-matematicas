@@ -16,15 +16,17 @@ var escenario = new Kinetic.Stage({
 
 var capaBotones = new Kinetic.Layer();
 var capaCubos = new Kinetic.Layer();
-var capaPapelera = new Kinetic.Layer();
+var capaVarios = new Kinetic.Layer();
 
 var borrando = false;
+
+var numeroBase10 = 0;
 
 var posiciones = {
 
 	cubo : {
 		x : 780,
-		y : 60,
+		y : 220,
 		offset : {
 			x : 17,
 			y : 0
@@ -32,7 +34,7 @@ var posiciones = {
 	},
 	barra : {
 		x : 480,
-		y : 60,
+		y : 220,
 		offset : {
 			x : 0,
 			y : 17
@@ -40,15 +42,15 @@ var posiciones = {
 	},
 	placa : {
 		x : 280,
-		y : 60,
+		y : 220,
 		offset : {
 			x : 2,
 			y : -2
 		}
 	},
 	bloque : {
-		x : 5,
-		y : 60,
+		x : 30,
+		y : 220,
 		offset : {
 			x : 0,
 			y : 0
@@ -130,6 +132,35 @@ function cargarImagenes() {
 			});
 		}
 	});
+
+}
+
+function cambioDeBase() {
+
+	var resul = [];
+
+	var cociente = numeroBase10;
+	var restos = [];
+	do {
+		restos.push(cociente % bases[base]);
+		cociente = Math.floor(cociente / bases[base]);
+	} while(cociente >= bases[base]);
+
+	restos.push(cociente);
+
+	var contador = restos.length - 1;
+	var maximo = (restos.length < 4) ? 4 : restos.length;
+	for (var i = 0; i < maximo; i++) {
+		if (restos.length < 4 && Math.abs(i - 4) > restos.length) {
+			resul.push(0);
+		} else {
+			resul.push(restos[contador]);
+			contador--;
+		}
+
+	}
+
+	return resul;
 
 }
 
@@ -397,7 +428,7 @@ function Elemento(x, y, tipo) {
 
 	});
 
-	var papelera = capaPapelera.get("#papelera")[0];
+	var papelera = capaVarios.get("#papelera")[0];
 
 	grupo.on('dragstart', function() {
 		grupo.moveToTop();
@@ -561,7 +592,7 @@ $(document).ready(function() {
 		alto : escenario.getHeight(),
 		relacion : 1026 / escenario.getHeight()
 	};
-	escenario.add(capaPapelera);
+	escenario.add(capaVarios);
 	escenario.add(capaCubos);
 	escenario.add(capaBotones);
 
@@ -750,6 +781,7 @@ function logicaJuego() {
 
 	var botonLimpiar = new Boton(966, 506, 32, 32, dictImg["icono_papelera"], function() {
 
+		numeroBase10 = 0;
 		var borradas = 0;
 		for (var i = 0; i < capaCubos.getChildren().length; i++) {
 			var elemento = capaCubos.getChildren()[i];
@@ -798,16 +830,42 @@ function logicaJuego() {
 
 	representacionNumerica.setId("numero");
 
-	representacionNumerica.setX((tamaño().width / 2) - (representacionNumerica.getWidth() / 2));
 	representacionBase.setX((tamaño().width / 2) - (representacionBase.getWidth() / 2));
 
 	var imgSubirBase = new Boton(representacionBase.getX() + representacionBase.getWidth() + 32, 57, 24, 24, dictImg["subirBase"], function() {
 
 		if (base != bases.length - 1) {
+			if (cuentaRepresentados().base10 != numeroBase10 && cuentaRepresentados().base10 != 0) {
+				numeroBase10 = cuentaRepresentados().base10;
+			}
 			base++;
+
 			representacionBase.setText("Base " + bases[base]);
 			capaBotones.draw();
+
 			capaCubos.removeChildren();
+			var resul = cambioDeBase();
+
+			if (resul.length <= 4 && resul.length != 0) {
+				for (var i = 0; i < resul.length; i++) {
+					for (var j = 0; j < resul[i]; j++) {
+						var nuevoElemento = new Elemento(posiciones[prioridad[i]].x, posiciones[prioridad[i]].y, prioridad[i]);
+						nuevoElemento.setScale(0, 0);
+
+						capaCubos.add(nuevoElemento);
+
+						nuevoElemento.transitionTo({
+							scale : {
+								x : 1,
+								y : 1
+							},
+							duration : 0.3,
+							easing : 'back-ease-out'
+						});
+					}
+				}
+
+			}
 
 			capaCubos.draw();
 
@@ -823,10 +881,34 @@ function logicaJuego() {
 	var imgBajarBase = new Boton(representacionBase.getX() - 28, 57, 24, 24, dictImg["bajarBase"], function() {
 
 		if (base != 0) {
+			if (numeroBase10 < limites[base - 1]) {
+				numeroBase10 = cuentaRepresentados().base10;
+			}
 			base--;
 			representacionBase.setText("Base " + bases[base]);
 			capaBotones.draw();
 			capaCubos.removeChildren();
+			var resul = cambioDeBase();
+
+			if (resul.length <= 4 && resul.length != 0) {
+				for (var i = 0; i < resul.length; i++) {
+					for (var j = 0; j < resul[i]; j++) {
+						var nuevoElemento = new Elemento(posiciones[prioridad[i]].x, posiciones[prioridad[i]].y, prioridad[i]);
+						nuevoElemento.setScale(0, 0);
+
+						capaCubos.add(nuevoElemento);
+
+						nuevoElemento.transitionTo({
+							scale : {
+								x : 1,
+								y : 1
+							},
+							duration : 0.3,
+							easing : 'back-ease-out'
+						});
+					}
+				}
+			}
 			capaCubos.draw();
 		}
 
@@ -845,7 +927,7 @@ function logicaJuego() {
 	capaBotones.add(representacionNumerica);
 	capaBotones.add(representacionBase);
 
-	capaPapelera.add(botonLimpiar);
+	capaVarios.add(botonLimpiar);
 
 	capaBotones.add(imgBotonCubo);
 
@@ -854,6 +936,40 @@ function logicaJuego() {
 	capaBotones.add(imgBotonPlacas);
 
 	capaBotones.add(imgBotonBloques);
+
+	var consejosMostrados = {
+		colocarNuevoElemento : false
+	};
+
+	/*var consejos = new Kinetic.Animation(function(frame) {
+		var time = frame.time / 1000, timeDiff = frame.timeDiff / 1000, frameRate = frame.frameRate;
+		if (frame.time > 4 && !consejosMostrados.colocarNuevoElemento) {
+			consejosMostrados.colocarNuevoElemento = true;
+			var consejo = new Kinetic.Label({
+				x : 891,
+				y : 130,
+				opacity : 1,
+				listening : false,
+				text : {
+					text : 'Pulsa o arrastra para sacar un nuevo elemento',
+					fontFamily : 'Calibri',
+					fontSize : 18,
+					padding : 5,
+					fill : 'white'
+				},
+				rect : {
+					fill : 'green',
+					pointerDirection : 'up',
+					pointerWidth : 20,
+					pointerHeight : 28,
+					lineJoin : 'round',
+				}
+			});
+		}
+
+	}, capaBotones);
+
+	consejos.start();*/
 
 	capaCubos.on('draw', function() {
 
@@ -871,17 +987,28 @@ function logicaJuego() {
 			}
 		}
 
-		if (cuenta.texto == "nada") {
+		if (cuenta.base10 == 0 && numeroBase10 != 0) {
 
-			representacionNumerica.hide();
-			capaBotones.draw();
-
+			var resul = cambioDeBase();
+			var texto = "";
+			for (var i = 0; i < resul.length; i++) {
+				texto += resul[i] + " ";
+			}
+			representacionNumerica.setText(texto);
 		} else {
-			if (!representacionNumerica.isVisible())
-				representacionNumerica.show();
 
-			representacionNumerica.setText(cuenta.texto);
+			if (cuenta.texto == "nada") {
 
+				representacionNumerica.hide();
+				capaBotones.draw();
+
+			} else {
+				if (!representacionNumerica.isVisible())
+					representacionNumerica.show();
+
+				representacionNumerica.setText(cuenta.texto);
+
+			}
 		}
 
 		if (base != 0 && !imgBajarBase.isVisible()) {
@@ -892,11 +1019,12 @@ function logicaJuego() {
 			imgSubirBase.show();
 		}
 
+		representacionNumerica.setX((tamaño().width / 2) - (representacionNumerica.getWidth() / 2));
 		capaBotones.draw();
 
 	});
 
 	capaBotones.draw();
 	capaCubos.draw();
-	capaPapelera.draw();
+	capaVarios.draw();
 }
