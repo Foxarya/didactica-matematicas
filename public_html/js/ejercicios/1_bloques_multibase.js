@@ -25,8 +25,8 @@ var numeroBase10 = 0;
 var posiciones = {
 
 	cubo : {
-		x : 780,
-		y : 220,
+		x : 891,
+		y : 130,
 		offset : {
 			x : 17,
 			y : 0
@@ -505,19 +505,23 @@ function Boton(x, y, ancho, alto, contenido, onclick, ondrag) {
 
 	if ( contenido instanceof Image) {
 		boton = new Kinetic.Image({
-			x : -(contenido.width / 2),
-			y : -(contenido.height / 2),
-			image : contenido,
-			width : ancho,
-			heigth : alto,
-			draggable : draggable,
-			dragBoundFunc : function(pos) {
-				return {
-					x : this.getAbsolutePosition().x,
-					y : this.getAbsolutePosition().y
-				}
+		x : -(contenido.width / 2),
+		y : -(contenido.height / 2),
+		image : contenido,
+		width : ancho,
+		heigth : alto,
+		shadowColor: 'black',
+		shadowBlur: 1.5,
+		shadowOffset: 5,
+		shadowOpacity: 0.1,
+		draggable : draggable,
+		dragBoundFunc : function(pos) {
+			return {
+				x : this.getAbsolutePosition().x,
+				y : this.getAbsolutePosition().y
 			}
-		});
+		}
+	});
 
 	} else {
 		boton = new Kinetic.Label({
@@ -878,6 +882,7 @@ function logicaJuego() {
 
 	});
 
+	
 	var imgBajarBase = new Boton(representacionBase.getX() - 28, 57, 24, 24, dictImg["bajarBase"], function() {
 
 		if (base != 0) {
@@ -937,34 +942,53 @@ function logicaJuego() {
 
 	capaBotones.add(imgBotonBloques);
 
-	var consejosMostrados = {
+	/*var consejosMostrados = {
 		colocarNuevoElemento : false
 	};
 
-	/*var consejos = new Kinetic.Animation(function(frame) {
-		var time = frame.time / 1000, timeDiff = frame.timeDiff / 1000, frameRate = frame.frameRate;
-		if (frame.time > 4 && !consejosMostrados.colocarNuevoElemento) {
+	var consejos = new Kinetic.Animation(function(frame) {
+		var time = frame.time, timeDiff = frame.timeDiff / 1000, frameRate = frame.frameRate;
+		if (frame.time > 4000 && !consejosMostrados.colocarNuevoElemento) {
 			consejosMostrados.colocarNuevoElemento = true;
 			var consejo = new Kinetic.Label({
 				x : 891,
-				y : 130,
-				opacity : 1,
+				y : 50,
+				opacity : 0,
 				listening : false,
 				text : {
-					text : 'Pulsa o arrastra para sacar un nuevo elemento',
+					text : 'Pulsa o arrastra para\nsacar un nuevo cubo',
 					fontFamily : 'Calibri',
 					fontSize : 18,
 					padding : 5,
-					fill : 'white'
+					fill : 'black'
 				},
 				rect : {
-					fill : 'green',
-					pointerDirection : 'up',
+					fill : 'yellow',
+					stroke : 'black',
+					strokeWidth : 2,
+					opacity : 0.5,
+					pointerDirection : 'down',
 					pointerWidth : 20,
-					pointerHeight : 28,
+					pointerHeight : 10,
 					lineJoin : 'round',
+					shadowColor : 'black',
+					shadowBlur : 2,
+					shadowOffset : 10,
+					shadowOpacity : 0.1
 				}
 			});
+
+			consejo.setOffset(consejo.getWidth() / 2, consejo.getHeight() / 2);
+
+			capaBotones.add(consejo);
+
+			consejo.transitionTo({
+				y : 70,
+				opacity : 0.5,
+				duration : 1.5,
+				easing : 'ease-out'
+			});
+
 		}
 
 	}, capaBotones);
