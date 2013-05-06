@@ -667,7 +667,7 @@
 
 		consejos.start();*/
 		
-		var limiteRepesentacionGrafica = new Kinetic.Text({
+		var limiteRepresentacionGrafica = new Kinetic.Text({
 			x : MathCanvas.tamaño().ancho / 2,
 			y : 70,
 			text : 'El número no se puede representar gráficamente',
@@ -685,8 +685,11 @@
 			fill : 'red'
 		});
 		
-		limiteRepesentacionGrafica.setX((MathCanvas.tamaño().ancho / 2) - (limiteRepesentacionGrafica.getWidth() / 2));
+		limiteRepresentacionGrafica.setX((MathCanvas.tamaño().ancho / 2) - (limiteRepresentacionGrafica.getWidth() / 2));
 		agrupacionPosible.setX((MathCanvas.tamaño().ancho / 2) - (agrupacionPosible.getWidth() / 2));
+		
+		capaBotones.add(limiteRepresentacionGrafica);
+		capaBotones.add(agrupacionPosible);
 		
 
 		capaCubos.on('draw', function() {
@@ -718,21 +721,19 @@
 
 				//Aquí se avisa que el número no se puede representar gráficamente en la base actual.
 				
-				capaBotones.add(limiteRepesentacionGrafica);
-				
-				limiteRepesentacionGrafica.show();
+				if(!limiteRepresentacionGrafica.isVisible())
+					limiteRepresentacionGrafica.show();
 			
 			} else {
 
 				if (cuenta.texto == "nada") {
 
 					representacionNumerica.hide();
-					capaBotones.draw();
 
 					//Aquí se avisa que quedan elementos por agrupar.
 					
-					capaBotones.add(agrupacionPosible);
-					agrupacionPosible.show();
+					if(!agrupacionPosible.isVisible())
+						agrupacionPosible.show();
 					
 
 				} else {
@@ -743,8 +744,11 @@
 
 					//Aquí habría que comprobar si hay avisos mostrándose y hacerlos desaparecer
 					
-					limiteRepesentacionGrafica.hide();
-					agrupacionPosible.hide();
+					if(limiteRepresentacionGrafica.isVisible())
+						limiteRepresentacionGrafica.hide();
+						
+					if(agrupacionPosible.isVisible())
+						agrupacionPosible.hide();
 					
 
 				}
