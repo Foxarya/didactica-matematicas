@@ -245,6 +245,7 @@ var MathCanvas = {};
 	 * @param {Object} config
 	 * @param {Integer} config.x
 	 * @param {Integer} config.y
+	 * @param {Image|String} config.contenido
 	 * @param {Integer} [config.ancho]
 	 * @param {Integer} [config.alto]
 	 * @param {Function} [config.onClick] Acción opcional a realizar cuando se haga click al botón

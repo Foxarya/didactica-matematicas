@@ -17,35 +17,19 @@
 	var posiciones = {
 		bloque : {
 			x : 128,
-			y : 130,
-			offset : {
-				x : 0,
-				y : 0
-			}
+			y : 130
 		},
 		placa : {
 			x : 385,
-			y : 130,
-			offset : {
-				x : 2,
-				y : -2
-			}
+			y : 130
 		},
 		barra : {
 			x : 641,
-			y : 130,
-			offset : {
-				x : 0,
-				y : 17
-			}
+			y : 130
 		},
 		cubo : {
 			x : 898,
-			y : 130,
-			offset : {
-				x : 17,
-				y : 0
-			}
+			y : 130
 		}
 
 	};
@@ -462,7 +446,7 @@
 
 			boton.tipo = tipo;
 
-			botones.splice(0, 0, boton);
+			botones.push(boton);
 
 			capaBotones.add(boton);
 
@@ -500,6 +484,7 @@
 						}
 					});
 				}
+				capaCubos.draw();
 			}
 		});
 
@@ -548,7 +533,7 @@
 					if (resul.length <= 4 && resul.length != 0) {
 						for (var i = resul.length - 1; i >= 0; i--) {
 							for (var j = 0; j < resul[i]; j++) {
-								var nuevoElemento = new Elemento(posiciones[prioridad[i]].x, posiciones[prioridad[i]].y, prioridad[i]);
+								var nuevoElemento = new Elemento((botones[i].getX() - 64) + (Math.random() * 128), limiteArrastreY + (Math.random() * (MathCanvas.tamaño().alto - limiteArrastreY - 100)), prioridad[i]);
 								nuevoElemento.setScale(0, 0);
 
 								capaCubos.add(nuevoElemento);
@@ -596,9 +581,9 @@
 					var resul = cambioDeBase();
 
 					if (resul.length <= 4 && resul.length != 0) {
-						for (var i = 0; i < resul.length; i++) {
+						for (var i = resul.length - 1; i >= 0; i--) {
 							for (var j = 0; j < resul[i]; j++) {
-								var nuevoElemento = new Elemento(posiciones[prioridad[i]].x, posiciones[prioridad[i]].y, prioridad[i]);
+								var nuevoElemento = new Elemento((botones[i].getX() - 64) + (Math.random() * 128), limiteArrastreY + (Math.random() * (MathCanvas.tamaño().alto - limiteArrastreY - 100)), prioridad[i]);
 								nuevoElemento.setScale(0, 0);
 
 								capaCubos.add(nuevoElemento);
@@ -633,7 +618,7 @@
 
 		capaVarios.add(botonLimpiar);
 
-		var consejos = new Kinetic.Animation(function(frame) {
+		/*var consejos = new Kinetic.Animation(function(frame) {
 			var time = frame.time, timeDiff = frame.timeDiff / 1000, frameRate = frame.frameRate;
 			if (frame.time > 4000 && !consejosMostrados.colocarNuevoElemento) {
 				consejosMostrados.colocarNuevoElemento = true;
@@ -680,14 +665,17 @@
 
 		}, capaBotones);
 
-		consejos.start();
+		consejos.start();*/
+		
+		
 
 		capaCubos.on('draw', function() {
 
 			var cuenta = cuentaRepresentados();
-
-			for (var i = 0; i < botones.length; i++) {
-				if (cuenta.base10 + Math.pow(bases[base], i) > limites[base]) {
+			
+			var potencia = 3;
+			for (var i in botones) {
+				if (cuenta.base10 + Math.pow(bases[base], potencia) > limites[base]) {
 					if (botones[i].isListening()) {
 						botones[i].setOpacity(0.5);
 						botones[i].setListening(false);
@@ -696,6 +684,7 @@
 					botones[i].setListening(true);
 					botones[i].setOpacity(1);
 				}
+				potencia--;
 			}
 
 			if (cuenta.base10 == 0 && numeroBase10 != 0) {
