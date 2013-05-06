@@ -17,7 +17,7 @@
 	var posiciones = {
 		bloque : {
 			x : 128,
-			y : 130,
+			y : 150,
 			offset : {
 				x : 0,
 				y : 0
@@ -25,7 +25,7 @@
 		},
 		placa : {
 			x : 385,
-			y : 130,
+			y : 150,
 			offset : {
 				x : 2,
 				y : -2
@@ -33,7 +33,7 @@
 		},
 		barra : {
 			x : 641,
-			y : 130,
+			y : 150,
 			offset : {
 				x : 0,
 				y : 17
@@ -41,7 +41,7 @@
 		},
 		cubo : {
 			x : 898,
-			y : 130,
+			y : 150,
 			offset : {
 				x : 17,
 				y : 0
@@ -633,7 +633,7 @@
 
 		capaVarios.add(botonLimpiar);
 
-		var consejos = new Kinetic.Animation(function(frame) {
+		/* var consejos = new Kinetic.Animation(function(frame) {
 			var time = frame.time, timeDiff = frame.timeDiff / 1000, frameRate = frame.frameRate;
 			if (frame.time > 4000 && !consejosMostrados.colocarNuevoElemento) {
 				consejosMostrados.colocarNuevoElemento = true;
@@ -680,8 +680,29 @@
 
 		}, capaBotones);
 
-		consejos.start();
-
+		consejos.start();*/
+		
+		var limiteRepesentacionGrafica = new Kinetic.Text({
+			x : MathCanvas.tamaño().ancho / 2,
+			y : 70,
+			text : 'El número no se puede representar gráficamente',
+			fontSize : 18,
+			fontFamily : 'Calibri',
+			fill : 'red'
+		});
+		
+		var agrupacionPosible = new Kinetic.Text({
+			x : MathCanvas.tamaño().ancho / 2,
+			y : 70,
+			text : 'Hay elementos que pueden agruparse',
+			fontSize : 18,
+			fontFamily : 'Calibri',
+			fill : 'red'
+		});
+		
+		limiteRepesentacionGrafica.setX((MathCanvas.tamaño().ancho / 2) - (limiteRepesentacionGrafica.getWidth() / 2));
+		agrupacionPosible.setX((MathCanvas.tamaño().ancho / 2) - (agrupacionPosible.getWidth() / 2));
+		
 		capaCubos.on('draw', function() {
 
 			var cuenta = cuentaRepresentados();
@@ -708,7 +729,11 @@
 				representacionNumerica.setText(texto);
 
 				//Aquí se avisa que el número no se puede representar gráficamente en la base actual.
-
+				
+				capaBotones.add(limiteRepesentacionGrafica);
+				
+				limiteRepesentacionGrafica.show();
+			
 			} else {
 
 				if (cuenta.texto == "nada") {
@@ -717,6 +742,10 @@
 					capaBotones.draw();
 
 					//Aquí se avisa que quedan elementos por agrupar.
+					
+					capaBotones.add(agrupacionPosible);
+					agrupacionPosible.show();
+					
 
 				} else {
 					if (!representacionNumerica.isVisible())
@@ -725,6 +754,10 @@
 					representacionNumerica.setText(cuenta.texto);
 
 					//Aquí habría que comprobar si hay avisos mostrándose y hacerlos desaparecer
+					
+					limiteRepesentacionGrafica.hide();
+					agrupacionPosible.hide();
+					
 
 				}
 			}
