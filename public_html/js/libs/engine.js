@@ -180,19 +180,36 @@ var MathCanvas = {};
 
 			var canvas = this;
 
+			var cargando = new Kinetic.Text({
+				x : canvas.tamaño().ancho / 2,
+				y : canvas.tamaño().alto / 2,
+				text : 'Cargando',
+				fontSize : 32,
+				fontFamily : 'Calibri',
+				fill : 'black'
+			});
+			
+			cargando.setPosition((canvas.tamaño().ancho / 2) - (cargando.getWidth() / 2), (canvas.tamaño().alto / 2) - (cargando.getHeight() / 2));
+			
+			this.capaEngine.add(cargando);
+			
+			cargando.draw();
+
 			this.spritesheet = new Image();
 
 			this.spritesheet.onload = function() {
 
 				$.getJSON(canvas.urlEjercicio + "spritesheet.json", function(json) {
-
+					
+					cargando.destroy();
+					canvas.capaEngine.draw();
 					canvas.frames = json;
 					canvas.callback();
 
 				}).fail(function(jqxhr, textStatus, error) {
 					var err = textStatus + ', ' + error;
 					console.log("Request Failed: " + err);
-				})
+				});
 			};
 
 			this.spritesheet.src = this.urlEjercicio + "spritesheet.png";
