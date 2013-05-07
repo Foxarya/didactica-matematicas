@@ -1,6 +1,6 @@
 (function() {
 
-	var escenario;
+	var canvas;
 
 	var capaBotones = new Kinetic.Layer();
 	var capaCubos = new Kinetic.Layer();
@@ -48,21 +48,21 @@
 
 	var consejos = {
 		sacarNuevoElemento : {
-			trigger: true,
-			texto: "Pulsa o arrastra para añadir un elemento nuevo",
-			tiempo: 3
+			trigger : true,
+			texto : "Pulsa o arrastra para añadir un elemento nuevo",
+			tiempo : 3
 		},
-		agrupar: {
-			trigger: true,
-			texto: "Pulsa en cualquier parte\n y arrastra para agrupar elementos",
-			condicion: cuentaRepresentados().base10 >= bases[base],
-			tiempo: 4
+		agrupar : {
+			trigger : true,
+			texto : "Pulsa en cualquier parte\n y arrastra para agrupar elementos",
+			condicion : cuentaRepresentados().base10 >= bases[base],
+			tiempo : 4
 		},
 		desagrupar : {
-			trigger: true,
-			texto: "Pulsa dos veces para desagrupar\nelementos compuestos",
-			condicion: cuentaRepresentados().numero >= 10,
-			tiempo: 15
+			trigger : true,
+			texto : "Pulsa dos veces para desagrupar\nelementos compuestos",
+			condicion : cuentaRepresentados().numero >= 10,
+			tiempo : 15
 		}
 	};
 
@@ -262,38 +262,36 @@
 
 		this.x = x;
 		this.y = y;
-		this.tipo = tipo;
+		this.tipo = (tipo == "cubo") ? "cubo" : tipo + "_base" + bases[base];
 
-		var imagen = (tipo == "cubo") ? MathCanvas.dictImg["cubo"] : MathCanvas.dictImg[tipo + "_base" + bases[base]];
-
-		var kineticImage = new Kinetic.Image({
+		var sprite = new Kinetic.Sprite({
 			x : x,
 			y : y,
-			image : imagen,
-			width : imagen.width,
-			height : imagen.height,
-			offset : {
-				x : imagen.width / 2,
-				y : imagen.height / 2
+			width : canvas.frames[this.tipo][0].width,
+			height : canvas.frames[this.tipo][0].height,
+			offset: {
+				x: canvas.frames[this.tipo][0].width / 2,
+				y: canvas.frames[this.tipo][0].height / 2
 			},
+			image : canvas.spritesheet,
+			animation : this.tipo,
+			animations : canvas.frames,
 			draggable : true,
 			name : tipo
 		});
-
-		kineticImage.createImageHitRegion();
-
-		kineticImage.on('mouseover', function() {
+		
+		sprite.on('mouseover', function() {
 			document.body.style.cursor = 'pointer';
 		});
-		kineticImage.on('mouseout', function() {
+		sprite.on('mouseout', function() {
 			document.body.style.cursor = 'default';
 		});
 
-		kineticImage.on('dblclick dbltap', function() {
+		sprite.on('dblclick dbltap', function() {
 
 			if (tipo != "cubo") {
 
-				kineticImage.transitionTo({
+				sprite.transitionTo({
 					scale : {
 						x : 0.5,
 						y : 0.5
@@ -306,7 +304,7 @@
 						var nombreImagenSiguientes = (siguientes == "cubo") ? "cubo" : siguientes + "_base" + bases[base];
 
 						for (var i = 0; i < bases[base]; i++) {
-							var desagrupado = new Elemento(kineticImage.getX(), kineticImage.getY(), siguientes);
+							var desagrupado = new Elemento(sprite.getX(), sprite.getY(), siguientes);
 							desagrupado.setScale(0);
 							capaCubos.add(desagrupado);
 							desagrupado.transitionTo({
@@ -321,7 +319,7 @@
 							});
 
 						}
-						kineticImage.destroy();
+						sprite.destroy();
 						capaCubos.draw();
 
 					}
@@ -333,13 +331,13 @@
 
 		var papelera = capaVarios.get("#papelera")[0];
 
-		kineticImage.on('dragstart', function() {
-			kineticImage.moveToTop();
+		sprite.on('dragstart', function() {
+			sprite.moveToTop();
 		});
 
-		kineticImage.on('dragmove', function() {
-			if (MathCanvas.hayColision(kineticImage, papelera)) {
-				kineticImage.transitionTo({
+		sprite.on('dragmove', function() {
+			if (canvas.hayColision(sprite, papelera)) {
+				sprite.transitionTo({
 					opacity : 0.6,
 					scale : {
 						x : 0.9,
@@ -348,8 +346,8 @@
 					duration : 0.2,
 					easing : 'strong-ease-in'
 				});
-			} else if (kineticImage.getOpacity() != 1) {
-				kineticImage.transitionTo({
+			} else if (sprite.getOpacity() != 1) {
+				sprite.transitionTo({
 					opacity : 1,
 					scale : {
 						x : 1,
@@ -361,9 +359,9 @@
 			}
 		});
 
-		kineticImage.on('dragend', function() {
-			if (MathCanvas.hayColision(kineticImage, papelera)) {
-				kineticImage.transitionTo({
+		sprite.on('dragend', function() {
+			if (canvas.hayColision(sprite, papelera)) {
+				sprite.transitionTo({
 					x : papelera.getX(),
 					y : papelera.getY(),
 					scale : {
@@ -373,37 +371,37 @@
 					duration : 0.3,
 					easing : 'back-ease-in',
 					callback : function() {
-						kineticImage.destroy();
+						sprite.destroy();
 						capaCubos.draw();
 					}
 				});
 
 			}
 
-			if ( typeof kineticImage.getDragBoundFunc() == "undefined") {
-				kineticImage.setDragBoundFunc(function(pos) {
-					var nuevaY = (pos.y < limiteArrastreY) ? limiteArrastreY : pos.y;
+			if ( typeof sprite.getDragBoundFunc() == "undefined") {
+				sprite.setDragBoundFunc(function(pos) {
+					var nuevaY = (pos.y < limiteArrastreY * canvas.escenario.getScale().y) ? limiteArrastreY * canvas.escenario.getScale().y : pos.y;
 					return {
 						x : pos.x,
 						y : nuevaY
 					};
 				});
-				if (kineticImage.getY() < limiteArrastreY) {
-					kineticImage.setY(limiteArrastreY);
+				if (sprite.getY() < limiteArrastreY) {
+					sprite.setY(limiteArrastreY);
 					capaCubos.draw();
 				}
 
 			}
 		});
 
-		return kineticImage;
+		return sprite;
 
 	}
 
 
 	$(document).ready(function() {
 
-		escenario = new MathCanvas.Escenario({
+		canvas = new MathCanvas.Canvas({
 			capas : [capaVarios, capaBotones, capaCubos],
 			seleccion : {
 				capa : capaCubos,
@@ -425,10 +423,12 @@
 			var boton = new MathCanvas.Boton({
 				x : posiciones[tipo].x,
 				y : posiciones[tipo].y,
-				contenido : MathCanvas.dictImg["icono_" + tipo],
+				spritesheet : canvas.spritesheet,
+				imagen : "icono_" + tipo,
+				frames : canvas.frames,
 				onClick : function() {
 					if (!borrando) {
-						var elemento = new Elemento((this.getX() - 64) + (Math.random() * 128), limiteArrastreY + (Math.random() * (MathCanvas.tamaño().alto - limiteArrastreY - 100)), this.tipo);
+						var elemento = new Elemento((this.getX() - 64) + (Math.random() * 128), limiteArrastreY + (Math.random() * (canvas.tamaño().alto - limiteArrastreY - 100)), this.tipo);
 
 						capaCubos.add(elemento);
 
@@ -437,7 +437,7 @@
 				},
 				onDrag : function() {
 					if (!borrando) {
-						var elemento = new Elemento(MathCanvas.posicionRaton().x, MathCanvas.posicionRaton().y, this.tipo);
+						var elemento = new Elemento(canvas.posicionRaton().x, canvas.posicionRaton().y, this.tipo);
 						capaCubos.add(elemento);
 						elemento.startDrag();
 					}
@@ -457,7 +457,9 @@
 			y : 506,
 			ancho : 32,
 			alto : 32,
-			contenido : MathCanvas.dictImg["icono_papelera"],
+			spritesheet : canvas.spritesheet,
+			imagen : "icono_papelera",
+			frames : canvas.frames,
 			onClick : function() {
 				numeroBase10 = 0;
 				var borradas = 0;
@@ -491,7 +493,7 @@
 		botonLimpiar.setId("papelera");
 
 		var representacionNumerica = new Kinetic.Text({
-			x : MathCanvas.tamaño().ancho / 2,
+			x : canvas.tamaño().ancho / 2,
 			y : 15,
 			text : '0 0 0 0 ',
 			fontSize : 30,
@@ -499,7 +501,7 @@
 			fill : 'black'
 		});
 		var representacionBase = new Kinetic.Text({
-			x : MathCanvas.tamaño().ancho / 2,
+			x : canvas.tamaño().ancho / 2,
 			y : 47,
 			text : 'Base ' + bases[base],
 			fontSize : 18,
@@ -509,14 +511,16 @@
 
 		representacionNumerica.setId("numero");
 
-		representacionBase.setX((MathCanvas.tamaño().ancho / 2) - (representacionBase.getWidth() / 2));
+		representacionBase.setX((canvas.tamaño().ancho / 2) - (representacionBase.getWidth() / 2));
 
 		var btnSubirBase = new MathCanvas.Boton({
 			x : representacionBase.getX() + representacionBase.getWidth() + 32,
 			y : 57,
 			ancho : 24,
 			alto : 24,
-			contenido : MathCanvas.dictImg["subirBase"],
+			spritesheet : canvas.spritesheet,
+			imagen : "subirBase",
+			frames : canvas.frames,
 			onClick : function() {
 				if (base != bases.length - 1) {
 					if (cuentaRepresentados().base10 != numeroBase10 && cuentaRepresentados().base10 != 0) {
@@ -533,7 +537,7 @@
 					if (resul.length <= 4 && resul.length != 0) {
 						for (var i = resul.length - 1; i >= 0; i--) {
 							for (var j = 0; j < resul[i]; j++) {
-								var nuevoElemento = new Elemento((botones[i].getX() - 64) + (Math.random() * 128), limiteArrastreY + (Math.random() * (MathCanvas.tamaño().alto - limiteArrastreY - 100)), prioridad[i]);
+								var nuevoElemento = new Elemento((botones[i].getX() - 64) + (Math.random() * 128), limiteArrastreY + (Math.random() * (canvas.tamaño().alto - limiteArrastreY - 100)), prioridad[i]);
 								nuevoElemento.setScale(0, 0);
 
 								capaCubos.add(nuevoElemento);
@@ -568,7 +572,9 @@
 			y : 57,
 			ancho : 24,
 			alto : 24,
-			contenido : MathCanvas.dictImg["bajarBase"],
+			spritesheet : canvas.spritesheet,
+			imagen : "bajarBase",
+			frames : canvas.frames,
 			onClick : function() {
 				if (base != 0) {
 					if (numeroBase10 < limites[base - 1]) {
@@ -583,7 +589,7 @@
 					if (resul.length <= 4 && resul.length != 0) {
 						for (var i = resul.length - 1; i >= 0; i--) {
 							for (var j = 0; j < resul[i]; j++) {
-								var nuevoElemento = new Elemento((botones[i].getX() - 64) + (Math.random() * 128), limiteArrastreY + (Math.random() * (MathCanvas.tamaño().alto - limiteArrastreY - 100)), prioridad[i]);
+								var nuevoElemento = new Elemento((botones[i].getX() - 64) + (Math.random() * 128), limiteArrastreY + (Math.random() * (canvas.tamaño().alto - limiteArrastreY - 100)), prioridad[i]);
 								nuevoElemento.setScale(0, 0);
 
 								capaCubos.add(nuevoElemento);
@@ -619,83 +625,82 @@
 		capaVarios.add(botonLimpiar);
 
 		/*var consejos = new Kinetic.Animation(function(frame) {
-			var time = frame.time, timeDiff = frame.timeDiff / 1000, frameRate = frame.frameRate;
-			if (frame.time > 4000 && !consejosMostrados.colocarNuevoElemento) {
-				consejosMostrados.colocarNuevoElemento = true;
-				var consejo = new Kinetic.Label({
-					x : 891,
-					y : 50,
-					opacity : 0,
-					listening : false,
-					text : {
-						text : 'Pulsa o arrastra para\nsacar un nuevo cubo',
-						fontFamily : 'Calibri',
-						fontSize : 18,
-						padding : 5,
-						fill : 'black'
-					},
-					rect : {
-						fill : 'yellow',
-						stroke : 'black',
-						strokeWidth : 2,
-						opacity : 0.5,
-						pointerDirection : 'down',
-						pointerWidth : 20,
-						pointerHeight : 10,
-						lineJoin : 'round',
-						shadowColor : 'black',
-						shadowBlur : 2,
-						shadowOffset : 10,
-						shadowOpacity : 0.1
-					}
-				});
+		 var time = frame.time, timeDiff = frame.timeDiff / 1000, frameRate = frame.frameRate;
+		 if (frame.time > 4000 && !consejosMostrados.colocarNuevoElemento) {
+		 consejosMostrados.colocarNuevoElemento = true;
+		 var consejo = new Kinetic.Label({
+		 x : 891,
+		 y : 50,
+		 opacity : 0,
+		 listening : false,
+		 text : {
+		 text : 'Pulsa o arrastra para\nsacar un nuevo cubo',
+		 fontFamily : 'Calibri',
+		 fontSize : 18,
+		 padding : 5,
+		 fill : 'black'
+		 },
+		 rect : {
+		 fill : 'yellow',
+		 stroke : 'black',
+		 strokeWidth : 2,
+		 opacity : 0.5,
+		 pointerDirection : 'down',
+		 pointerWidth : 20,
+		 pointerHeight : 10,
+		 lineJoin : 'round',
+		 shadowColor : 'black',
+		 shadowBlur : 2,
+		 shadowOffset : 10,
+		 shadowOpacity : 0.1
+		 }
+		 });
 
-				consejo.setOffset(consejo.getWidth() / 2, consejo.getHeight() / 2);
+		 consejo.setOffset(consejo.getWidth() / 2, consejo.getHeight() / 2);
 
-				capaBotones.add(consejo);
+		 capaBotones.add(consejo);
 
-				consejo.transitionTo({
-					y : 70,
-					opacity : 0.5,
-					duration : 1.5,
-					easing : 'ease-out'
-				});
+		 consejo.transitionTo({
+		 y : 70,
+		 opacity : 0.5,
+		 duration : 1.5,
+		 easing : 'ease-out'
+		 });
 
-			}
+		 }
 
-		}, capaBotones);
+		 }, capaBotones);
 
-		consejos.start();*/
-		
+		 consejos.start();*/
+
 		var limiteRepresentacionGrafica = new Kinetic.Text({
-			x : MathCanvas.tamaño().ancho / 2,
+			x : canvas.tamaño().ancho / 2,
 			y : 70,
 			text : 'El número no se puede representar gráficamente',
 			fontSize : 18,
 			fontFamily : 'Calibri',
 			fill : 'red'
 		});
-		
+
 		var agrupacionPosible = new Kinetic.Text({
-			x : MathCanvas.tamaño().ancho / 2,
+			x : canvas.tamaño().ancho / 2,
 			y : 70,
 			text : 'Hay elementos que pueden agruparse',
 			fontSize : 18,
 			fontFamily : 'Calibri',
 			fill : 'red'
 		});
-		
-		limiteRepresentacionGrafica.setX((MathCanvas.tamaño().ancho / 2) - (limiteRepresentacionGrafica.getWidth() / 2));
-		agrupacionPosible.setX((MathCanvas.tamaño().ancho / 2) - (agrupacionPosible.getWidth() / 2));
-		
+
+		limiteRepresentacionGrafica.setX((canvas.tamaño().ancho / 2) - (limiteRepresentacionGrafica.getWidth() / 2));
+		agrupacionPosible.setX((canvas.tamaño().ancho / 2) - (agrupacionPosible.getWidth() / 2));
+
 		capaBotones.add(limiteRepresentacionGrafica);
 		capaBotones.add(agrupacionPosible);
-		
 
 		capaCubos.on('draw', function() {
 
 			var cuenta = cuentaRepresentados();
-			
+
 			var potencia = 3;
 			for (var i in botones) {
 				if (cuenta.base10 + Math.pow(bases[base], potencia) > limites[base]) {
@@ -720,10 +725,10 @@
 				representacionNumerica.setText(texto);
 
 				//Aquí se avisa que el número no se puede representar gráficamente en la base actual.
-				
-				if(!limiteRepresentacionGrafica.isVisible())
+
+				if (!limiteRepresentacionGrafica.isVisible())
 					limiteRepresentacionGrafica.show();
-			
+
 			} else {
 
 				if (cuenta.texto == "nada") {
@@ -731,10 +736,9 @@
 					representacionNumerica.hide();
 
 					//Aquí se avisa que quedan elementos por agrupar.
-					
-					if(!agrupacionPosible.isVisible())
+
+					if (!agrupacionPosible.isVisible())
 						agrupacionPosible.show();
-					
 
 				} else {
 					if (!representacionNumerica.isVisible())
@@ -743,13 +747,12 @@
 					representacionNumerica.setText(cuenta.texto);
 
 					//Aquí habría que comprobar si hay avisos mostrándose y hacerlos desaparecer
-					
-					if(limiteRepresentacionGrafica.isVisible())
+
+					if (limiteRepresentacionGrafica.isVisible())
 						limiteRepresentacionGrafica.hide();
-						
-					if(agrupacionPosible.isVisible())
+
+					if (agrupacionPosible.isVisible())
 						agrupacionPosible.hide();
-					
 
 				}
 			}
@@ -762,7 +765,7 @@
 				btnSubirBase.show();
 			}
 
-			representacionNumerica.setX((MathCanvas.tamaño().ancho / 2) - (representacionNumerica.getWidth() / 2));
+			representacionNumerica.setX((canvas.tamaño().ancho / 2) - (representacionNumerica.getWidth() / 2));
 			capaBotones.draw();
 
 		});
