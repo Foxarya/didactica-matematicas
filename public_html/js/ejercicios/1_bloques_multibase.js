@@ -209,17 +209,16 @@
 
 			grupos[i].each(function(elemento) {
 
-				elemento.transitionTo({
-					x : grupos[i][0].getX(),
-					y : grupos[i][0].getY(),
-					scale : {
-						x : 0.5,
-						y : 0.5
+				TweenLite.to(elemento, 0.3, {
+					setX : grupos[i][0].getX(),
+					setY : grupos[i][0].getY(),
+					setScaleX : 0.5,
+					setScaleY : 0.5,
+					ease : Strong.easeIn,
+					onUpdate : function() {
+						capaCubos.batchDraw();
 					},
-					duration : 0.3,
-					easing : 'strong-ease-in',
-					callback : function() {
-
+					onComplete : function() {
 						agrupados++;
 
 						if (agrupados == bases[base] * grupos.length) {
@@ -239,20 +238,20 @@
 								capaCubos.add(siguiente);
 								capaCubos.draw();
 
-								siguiente.transitionTo({
-									scale : {
-										x : 1,
-										y : 1
-									},
-									duration : 0.5,
-									easing : 'strong-ease-out'
+								TweenLite.to(siguiente, 0.5, {
+									setScaleX : 1,
+									setScaleY : 1,
+									ease : Strong.easeOut,
+									onUpdate : function() {
+										capaCubos.batchDraw();
+									}
 								});
 							}
 
 						}
-
 					}
 				});
+
 			});
 		}
 
@@ -269,9 +268,9 @@
 			y : y,
 			width : canvas.frames[this.tipo][0].width,
 			height : canvas.frames[this.tipo][0].height,
-			offset: {
-				x: canvas.frames[this.tipo][0].width / 2,
-				y: canvas.frames[this.tipo][0].height / 2
+			offset : {
+				x : canvas.frames[this.tipo][0].width / 2,
+				y : canvas.frames[this.tipo][0].height / 2
 			},
 			image : canvas.spritesheet,
 			animation : this.tipo,
@@ -279,7 +278,7 @@
 			draggable : true,
 			name : tipo
 		});
-		
+
 		sprite.on('mouseover', function() {
 			document.body.style.cursor = 'pointer';
 		});
@@ -291,15 +290,14 @@
 
 			if (tipo != "cubo") {
 
-				sprite.transitionTo({
-					scale : {
-						x : 0.5,
-						y : 0.5
+				TweenLite.to(sprite, 0.3, {
+					setScaleX : 0.5,
+					setScaleY : 0.5,
+					ease : Strong.easeIn,
+					onUpdate : function() {
+						capaCubos.batchDraw();
 					},
-					duration : 0.3,
-					easing : 'strong-ease-in',
-					callback : function() {
-
+					onComplete : function() {
 						var siguientes = prioridad[prioridad.indexOf(tipo) + 1];
 						var nombreImagenSiguientes = (siguientes == "cubo") ? "cubo" : siguientes + "_base" + bases[base];
 
@@ -307,23 +305,22 @@
 							var desagrupado = new Elemento(sprite.getX(), sprite.getY(), siguientes);
 							desagrupado.setScale(0);
 							capaCubos.add(desagrupado);
-							desagrupado.transitionTo({
-								x : (this.getX() - 32) + (Math.random() * 64),
-								y : (this.getY() - 32) + (Math.random() * 64),
-								scale : {
-									x : 1,
-									y : 1
-								},
-								duration : 0.5,
-								easing : 'strong-ease-out'
+							TweenLite.to(desagrupado, 0.5, {
+								setX : (desagrupado.getX() - 32) + (Math.random() * 64),
+								setY : (desagrupado.getY() - 32) + (Math.random() * 64),
+								setScaleX : 1,
+								setScaleY : 1,
+								ease : Strong.easeOut,
+								onUpdate : function() {
+									capaCubos.batchDraw();
+								}
 							});
 
 						}
 						sprite.destroy();
 						capaCubos.draw();
-
 					}
-				});
+				})
 
 			}
 
@@ -337,40 +334,40 @@
 
 		sprite.on('dragmove', function() {
 			if (canvas.hayColision(sprite, papelera)) {
-				sprite.transitionTo({
-					opacity : 0.6,
-					scale : {
-						x : 0.9,
-						y : 0.9
-					},
-					duration : 0.2,
-					easing : 'strong-ease-in'
+				TweenLite.to(sprite, 0.2, {
+					setOpacity: 0.6,
+					setScaleX: 0.9,
+					setScaleY: 0.9,
+					ease: Strong.easeIn,
+					onUpdate: function() {
+						capaCubos.batchDraw();
+					}
 				});
 			} else if (sprite.getOpacity() != 1) {
-				sprite.transitionTo({
-					opacity : 1,
-					scale : {
-						x : 1,
-						y : 1
-					},
-					duration : 0.2,
-					easing : 'ease-out'
+				TweenLite.to(sprite, 0.2, {
+					setOpacity: 1,
+					setScaleX: 1,
+					setScaleY: 1,
+					ease: Power2.easeOut,
+					onUpdate: function() {
+						capaCubos.batchDraw();
+					}
 				});
 			}
 		});
 
 		sprite.on('dragend', function() {
 			if (canvas.hayColision(sprite, papelera)) {
-				sprite.transitionTo({
-					x : papelera.getX(),
-					y : papelera.getY(),
-					scale : {
-						x : 0.5,
-						y : 0.5
+				TweenLite.to(sprite, 0.3, {
+					setX: papelera.getX(),
+					setY: papelera.getY(),
+					setScaleX: 0.5,
+					setScaleY: 0.5,
+					ease: Back.easeIn,
+					onUpdate: function() {
+						capaCubos.batchDraw();
 					},
-					duration : 0.3,
-					easing : 'back-ease-in',
-					callback : function() {
+					onComplete: function() {
 						sprite.destroy();
 						capaCubos.draw();
 					}
@@ -466,17 +463,17 @@
 				for (var i = 0; i < capaCubos.getChildren().length; i++) {
 					var elemento = capaCubos.getChildren()[i];
 					borrando = true;
-					elemento.transitionTo({
-						x : this.getX(),
-						y : this.getY(),
-						opacity : 0.0,
-						scale : {
-							x : 0.5,
-							y : 0.5
+					TweenLite.to(elemento, 0.5, {
+						setX: botonLimpiar.getX(),
+						setY: botonLimpiar.getY(),
+						setOpacity: 0.0,
+						setScaleX: 0.5,
+						setScaleY: 0.5,
+						ease: Strong.easeOut,
+						onUpdate: function() {
+							capaCubos.batchDraw();
 						},
-						duration : 0.5,
-						easing : 'strong-ease-out',
-						callback : function() {
+						onComplete: function() {
 							borradas++;
 							if (borradas == capaCubos.getChildren().length) {
 								capaCubos.removeChildren();
@@ -541,14 +538,14 @@
 								nuevoElemento.setScale(0, 0);
 
 								capaCubos.add(nuevoElemento);
-
-								nuevoElemento.transitionTo({
-									scale : {
-										x : 1,
-										y : 1
-									},
-									duration : 0.3,
-									easing : 'back-ease-out'
+								
+								TweenLite.to(nuevoElemento, 0.3, {
+									setScaleX: 1,
+									setScaleY: 1,
+									ease: Back.easeOut,
+									onUpdate: function() {
+										capaCubos.batchDraw();
+									}
 								});
 							}
 						}
@@ -594,13 +591,13 @@
 
 								capaCubos.add(nuevoElemento);
 
-								nuevoElemento.transitionTo({
-									scale : {
-										x : 1,
-										y : 1
-									},
-									duration : 0.3,
-									easing : 'back-ease-out'
+								TweenLite.to(nuevoElemento, 0.3, {
+									setScaleX: 1,
+									setScaleY: 1,
+									ease: Back.easeOut,
+									onUpdate: function() {
+										capaCubos.batchDraw();
+									}
 								});
 							}
 						}
