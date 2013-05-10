@@ -114,8 +114,9 @@ var MathCanvas = {};
 			});
 
 			$(window).resize();
-
-			this.cargarSpriteSheet();
+			
+			if(typeof config.urlEjercicio != "undefined")
+				this.cargarSpriteSheet();
 
 			if ( typeof config.seleccion != "undefined") {
 				var seleccion = null;
@@ -219,12 +220,6 @@ var MathCanvas = {};
 					console.log(error);
 				});
 			};
-
-			this.spritesheet.onerror = function() {
-				cargando.destroy();
-				canvas.capaEngine.draw();
-				canvas.callback();
-			}
 
 			this.spritesheet.src = this.urlEjercicio + "spritesheet.png";
 
