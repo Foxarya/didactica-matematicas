@@ -1,5 +1,29 @@
+var SceneBloques;
+
 (function() {
 
+	SceneBloques = function(config) {
+		this._initScene();
+	}
+
+	SceneBloques.prototype = {
+		_initScene : function(config) {
+			$("<div id='canvasJuego' style='border: 2px solid black;border-top:0px'></div>").prependTo('.contenedor');
+
+			canvas = new MathCanvas.Canvas({
+				container : 'canvasJuego',
+				capas : [capaVarios, capaBotones, capaCubos],
+				ancho : 1026,
+				alto : 545,
+				seleccion : {
+					capa : capaCubos,
+					callback : agrupar
+				},
+				urlEjercicio : "img/ejercicios/1_bloques_multibase/",
+				callback : logicaJuego
+			});
+		}
+	}
 	var canvas;
 
 	var capaBotones = new Kinetic.Layer();
@@ -306,21 +330,21 @@
 		sprite.on('dragmove', function() {
 			if (canvas.hayColision(sprite, papelera)) {
 				TweenLite.to(sprite, 0.2, {
-					setOpacity: 0.6,
-					setScaleX: 0.9,
-					setScaleY: 0.9,
-					ease: Strong.easeIn,
-					onUpdate: function() {
+					setOpacity : 0.6,
+					setScaleX : 0.9,
+					setScaleY : 0.9,
+					ease : Strong.easeIn,
+					onUpdate : function() {
 						capaCubos.batchDraw();
 					}
 				});
 			} else if (sprite.getOpacity() != 1) {
 				TweenLite.to(sprite, 0.2, {
-					setOpacity: 1,
-					setScaleX: 1,
-					setScaleY: 1,
-					ease: Power2.easeOut,
-					onUpdate: function() {
+					setOpacity : 1,
+					setScaleX : 1,
+					setScaleY : 1,
+					ease : Power2.easeOut,
+					onUpdate : function() {
 						capaCubos.batchDraw();
 					}
 				});
@@ -330,15 +354,15 @@
 		sprite.on('dragend', function() {
 			if (canvas.hayColision(sprite, papelera)) {
 				TweenLite.to(sprite, 0.3, {
-					setX: papelera.getX(),
-					setY: papelera.getY(),
-					setScaleX: 0.5,
-					setScaleY: 0.5,
-					ease: Back.easeIn,
-					onUpdate: function() {
+					setX : papelera.getX(),
+					setY : papelera.getY(),
+					setScaleX : 0.5,
+					setScaleY : 0.5,
+					ease : Back.easeIn,
+					onUpdate : function() {
 						capaCubos.batchDraw();
 					},
-					onComplete: function() {
+					onComplete : function() {
 						sprite.destroy();
 						capaCubos.draw();
 					}
@@ -366,27 +390,6 @@
 
 	}
 
-
-	function initJuego() {
-		
-		$("<div id='canvasJuego' style='border: 2px solid black;border-top:0px'></div>").prependTo('.contenedor');
-
-		canvas = new MathCanvas.Canvas({
-			container: 'canvasJuego',
-			capas : [capaVarios, capaBotones, capaCubos],
-			ancho: 1026,
-			alto: 545,
-			seleccion : {
-				capa : capaCubos,
-				callback : agrupar
-			},
-			urlEjercicio : "img/ejercicios/1_bloques_multibase/",
-			callback : logicaJuego
-		});
-		
-		
-
-	}
 
 	function logicaJuego() {
 
@@ -442,16 +445,16 @@
 					var elemento = capaCubos.getChildren()[i];
 					borrando = true;
 					TweenLite.to(elemento, 0.5, {
-						setX: botonLimpiar.getX(),
-						setY: botonLimpiar.getY(),
-						setOpacity: 0.0,
-						setScaleX: 0.5,
-						setScaleY: 0.5,
-						ease: Strong.easeOut,
-						onUpdate: function() {
+						setX : botonLimpiar.getX(),
+						setY : botonLimpiar.getY(),
+						setOpacity : 0.0,
+						setScaleX : 0.5,
+						setScaleY : 0.5,
+						ease : Strong.easeOut,
+						onUpdate : function() {
 							capaCubos.batchDraw();
 						},
-						onComplete: function() {
+						onComplete : function() {
 							borradas++;
 							if (borradas == capaCubos.getChildren().length) {
 								capaCubos.removeChildren();
@@ -516,12 +519,12 @@
 								nuevoElemento.setScale(0, 0);
 
 								capaCubos.add(nuevoElemento);
-								
+
 								TweenLite.to(nuevoElemento, 0.3, {
-									setScaleX: 1,
-									setScaleY: 1,
-									ease: Back.easeOut,
-									onUpdate: function() {
+									setScaleX : 1,
+									setScaleY : 1,
+									ease : Back.easeOut,
+									onUpdate : function() {
 										capaCubos.batchDraw();
 									}
 								});
@@ -570,10 +573,10 @@
 								capaCubos.add(nuevoElemento);
 
 								TweenLite.to(nuevoElemento, 0.3, {
-									setScaleX: 1,
-									setScaleY: 1,
-									ease: Back.easeOut,
-									onUpdate: function() {
+									setScaleX : 1,
+									setScaleY : 1,
+									ease : Back.easeOut,
+									onUpdate : function() {
 										capaCubos.batchDraw();
 									}
 								});
@@ -749,6 +752,4 @@
 		capaCubos.draw();
 		capaVarios.draw();
 	}
-	
-	initJuego();
 })();
