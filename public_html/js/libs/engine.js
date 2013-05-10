@@ -54,7 +54,9 @@ var MathCanvas = {};
 	 * Escenario constructor
 	 * @constructor
 	 * @param {Object} config
-	 * @param {Array|Kinetic.Layer} capas
+	 * @param {Array|Kinetic.Layer} config.capas
+	 * @param {Integer} config.ancho
+	 * @param {Integer} config.alto
 	 * @param {Object} config.seleccion
 	 * @param {Kinetic.Layer} config.seleccion.capa
 	 * @param {Function} config.seleccion.callback
@@ -75,8 +77,8 @@ var MathCanvas = {};
 
 			this.escenario = new Kinetic.Stage({
 				container : 'container',
-				width : 1026,
-				height : 575,
+				width : config.ancho,
+				height : config.alto,
 				draggable : true,
 				dragBoundFunc : function(pos) {
 					return {
@@ -93,14 +95,16 @@ var MathCanvas = {};
 			this.escenario.add(this.capaEngine);
 
 			$(window).resize({
-				canvas : this
+				canvas : this,
+				anchoOriginal : config.ancho,
+				altoOriginal : config.alto
 			}, function(event) {
 
 				$('#container').attr('width', $('#container').parent().width());
-				$('#container').attr('height', $('#container').parent().width() / (1026 / 575));
+				$('#container').attr('height', $('#container').parent().width() / (event.data.anchoOriginal / event.data.altoOriginal));
 				event.data.canvas.escenario.setWidth($('#container').parent().width());
-				event.data.canvas.escenario.setHeight($('#container').parent().width() / (1026 / 575));
-				event.data.canvas.escenario.setScale($('#container').width() / 1026, $('#container').height() / 575);
+				event.data.canvas.escenario.setHeight($('#container').parent().width() / (event.data.anchoOriginal / event.data.altoOriginal));
+				event.data.canvas.escenario.setScale($('#container').width() / event.data.anchoOriginal, $('#container').height() / event.data.altoOriginal);
 
 			});
 
@@ -188,11 +192,11 @@ var MathCanvas = {};
 				fontFamily : 'Calibri',
 				fill : 'black'
 			});
-			
+
 			cargando.setPosition((canvas.tamaño().ancho / 2) - (cargando.getWidth() / 2), (canvas.tamaño().alto / 2) - (cargando.getHeight() / 2));
-			
+
 			this.capaEngine.add(cargando);
-			
+
 			cargando.draw();
 
 			this.spritesheet = new Image();
@@ -200,7 +204,7 @@ var MathCanvas = {};
 			this.spritesheet.onload = function() {
 
 				$.getJSON(canvas.urlEjercicio + "spritesheet.json", function(json) {
-					
+
 					cargando.destroy();
 					canvas.capaEngine.draw();
 					canvas.frames = json;
@@ -262,6 +266,33 @@ var MathCanvas = {};
 			}
 
 			return false;
+		},
+
+		cambiarBase : function(numero, base) {
+			var resul = [];
+
+			var cociente = numero;
+			var restos = [];
+			do {
+				restos.push(cociente % base);
+				cociente = Math.floor(cociente / base);
+			} while(cociente >= base);
+
+			restos.push(cociente);
+
+			var contador = restos.length - 1;
+			var maximo = (restos.length < 4) ? 4 : restos.length;
+			for (var i = 0; i < maximo; i++) {
+				if (restos.length < 4 && Math.abs(i - 4) > restos.length) {
+					resul.push(0);
+				} else {
+					resul.push(restos[contador]);
+					contador--;
+				}
+
+			}
+
+			return resul;
 		}
 	};
 

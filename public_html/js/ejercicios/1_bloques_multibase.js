@@ -70,35 +70,6 @@
 	 * FIN CONSTANTES
 	 */
 
-	function cambioDeBase() {
-
-		var resul = [];
-
-		var cociente = numeroBase10;
-		var restos = [];
-		do {
-			restos.push(cociente % bases[base]);
-			cociente = Math.floor(cociente / bases[base]);
-		} while(cociente >= bases[base]);
-
-		restos.push(cociente);
-
-		var contador = restos.length - 1;
-		var maximo = (restos.length < 4) ? 4 : restos.length;
-		for (var i = 0; i < maximo; i++) {
-			if (restos.length < 4 && Math.abs(i - 4) > restos.length) {
-				resul.push(0);
-			} else {
-				resul.push(restos[contador]);
-				contador--;
-			}
-
-		}
-
-		return resul;
-
-	}
-
 	function cuentaRepresentados() {
 
 		var cantidades = [];
@@ -400,6 +371,8 @@
 
 		canvas = new MathCanvas.Canvas({
 			capas : [capaVarios, capaBotones, capaCubos],
+			ancho: 1026,
+			alto: 545,
 			seleccion : {
 				capa : capaCubos,
 				callback : agrupar
@@ -529,7 +502,7 @@
 					capaBotones.draw();
 
 					capaCubos.removeChildren();
-					var resul = cambioDeBase();
+					var resul = canvas.cambiarBase(numeroBase10, bases[base]);
 
 					if (resul.length <= 4 && resul.length != 0) {
 						for (var i = resul.length - 1; i >= 0; i--) {
@@ -581,7 +554,7 @@
 					representacionBase.setText("Base " + bases[base]);
 					capaBotones.draw();
 					capaCubos.removeChildren();
-					var resul = cambioDeBase();
+					var resul = canvas.cambiarBase(numeroBase10, bases[base]);
 
 					if (resul.length <= 4 && resul.length != 0) {
 						for (var i = resul.length - 1; i >= 0; i--) {
@@ -714,7 +687,7 @@
 
 			if (cuenta.base10 == 0 && numeroBase10 != 0) {
 
-				var resul = cambioDeBase();
+				var resul = canvas.cambiarBase(numeroBase10, bases[base]);
 				var texto = "";
 				for (var i = 0; i < resul.length; i++) {
 					texto += resul[i] + " ";
