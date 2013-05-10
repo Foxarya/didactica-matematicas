@@ -105,11 +105,11 @@ var MathCanvas = {};
 				altoOriginal : config.alto
 			}, function(event) {
 
-				$('#'+event.data.container).attr('width', $('#'+event.data.container).parent().width());
-				$('#'+event.data.container).attr('height', $('#'+event.data.container).parent().width() / (event.data.anchoOriginal / event.data.altoOriginal));
-				event.data.canvas.escenario.setWidth($('#'+event.data.container).parent().width());
-				event.data.canvas.escenario.setHeight($('#'+event.data.container).parent().width() / (event.data.anchoOriginal / event.data.altoOriginal));
-				event.data.canvas.escenario.setScale($('#'+event.data.container).width() / event.data.anchoOriginal, $('#'+event.data.container).height() / event.data.altoOriginal);
+				$('#' + event.data.container).attr('width', $('#' + event.data.container).parent().width());
+				$('#' + event.data.container).attr('height', $('#' + event.data.container).parent().width() / (event.data.anchoOriginal / event.data.altoOriginal));
+				event.data.canvas.escenario.setWidth($('#' + event.data.container).parent().width());
+				event.data.canvas.escenario.setHeight($('#' + event.data.container).parent().width() / (event.data.anchoOriginal / event.data.altoOriginal));
+				event.data.canvas.escenario.setScale($('#' + event.data.container).width() / event.data.anchoOriginal, $('#' + event.data.container).height() / event.data.altoOriginal);
 
 			});
 
@@ -216,10 +216,15 @@ var MathCanvas = {};
 					canvas.callback();
 
 				}).fail(function(jqxhr, textStatus, error) {
-					var err = textStatus + ', ' + error;
-					console.log("Request Failed: " + err);
+					console.log(error);
 				});
 			};
+
+			this.spritesheet.onerror = function() {
+				cargando.destroy();
+				canvas.capaEngine.draw();
+				canvas.callback();
+			}
 
 			this.spritesheet.src = this.urlEjercicio + "spritesheet.png";
 
