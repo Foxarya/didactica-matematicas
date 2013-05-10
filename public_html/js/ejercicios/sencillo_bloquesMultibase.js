@@ -10,10 +10,10 @@
 			
 			var bloquesJuego = new SceneBloques();
 			
-			$("<div id='canvasInterfaz' style='border: 2px solid black;border-bottom:0px'></div>").prependTo('.contenedor');
-
-			canvas = new MathCanvas.Canvas({
-				container : 'canvasInterfaz',
+			$("<div id='canvasInterface' style='border: 2px solid black;border-bottom:0px'></div>").prependTo('.contenedor');
+debugger;
+			canvasInterfaz = new MathCanvas.Canvas({
+				container : 'canvasInterface',
 				capas : [capaInterfaz],
 				ancho : 1026,
 				alto : 80,
@@ -24,7 +24,6 @@
 	});
 
 	function logicaInterfaz() {
-		
 
 		var representacionNumerica = new Kinetic.Text({
 			x : canvasInterfaz.tamaño().ancho / 2,
