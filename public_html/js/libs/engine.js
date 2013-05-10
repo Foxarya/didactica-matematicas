@@ -185,8 +185,9 @@ var MathCanvas = {};
 			
 			if(typeof config.urlEjercicio != "undefined")
 				this.cargarSpriteSheet();
-			else 
-				this.callback();
+			else {
+				setTimeout(this.callback, 500);
+			}
 			
 		},
 

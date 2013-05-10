@@ -2,13 +2,17 @@ var SceneBloques;
 
 (function() {
 
+
+	var canvas;
+
+
 	SceneBloques = function(config) {
 		this._initScene();
 	}
 
 	SceneBloques.prototype = {
 		_initScene : function(config) {
-			$("<div id='canvasJuego' style='border: 2px solid black;border-top:0px'></div>").prependTo('.contenedor');
+			$("<div id='canvasJuego' style='border: 2px solid black'></div>").prependTo('.contenedor');
 
 			canvas = new MathCanvas.Canvas({
 				container : 'canvasJuego',
@@ -22,10 +26,9 @@ var SceneBloques;
 				urlEjercicio : "img/ejercicios/1_bloques_multibase/",
 				callback : logicaJuego
 			});
+			
 		}
 	}
-	var canvas;
-
 	var capaBotones = new Kinetic.Layer();
 	var capaCubos = new Kinetic.Layer();
 	var capaVarios = new Kinetic.Layer();

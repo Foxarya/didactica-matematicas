@@ -1,6 +1,8 @@
 (function() {
 
 	var canvasInterfaz;
+	
+	var bloquesJuego;
 
 	var capaInterfaz = new Kinetic.Layer();
 
@@ -8,10 +10,10 @@
 
 		$.getScript("js/ejercicios/1_bloques_multibase.js").done(function(script, textStatus) {
 			
-			var bloquesJuego = new SceneBloques();
+			bloquesJuego = new SceneBloques();
 			
-			$("<div id='canvasInterface' style='border: 2px solid black;border-bottom:0px'></div>").prependTo('.contenedor');
-debugger;
+			$("<div id='canvasInterface' style='border: 2px solid black'></div>").prependTo('.contenedor');
+
 			canvasInterfaz = new MathCanvas.Canvas({
 				container : 'canvasInterface',
 				capas : [capaInterfaz],
@@ -24,7 +26,7 @@ debugger;
 	});
 
 	function logicaInterfaz() {
-
+		
 		var representacionNumerica = new Kinetic.Text({
 			x : canvasInterfaz.tamaño().ancho / 2,
 			y : 15,
@@ -36,7 +38,7 @@ debugger;
 		var representacionBase = new Kinetic.Text({
 			x : canvasInterfaz.tamaño().ancho / 2,
 			y : 47,
-			text : 'Base ' + bases[base],
+			text : 'Base ',
 			fontSize : 18,
 			fontFamily : 'Calibri',
 			fill : 'black'
@@ -46,7 +48,7 @@ debugger;
 
 		representacionBase.setX((canvasInterfaz.tamaño().ancho / 2) - (representacionBase.getWidth() / 2));
 
-		var btnSubirBase = new MathCanvas.Boton({
+		/*var btnSubirBase = new MathCanvas.Boton({
 			x : representacionBase.getX() + representacionBase.getWidth() + 32,
 			y : 57,
 			ancho : 24,
@@ -150,7 +152,7 @@ debugger;
 		});
 
 		capaInterfaz.add(btnSubirBase);
-		capaInterfaz.add(btnBajarBase);
+		capaInterfaz.add(btnBajarBase);*/
 
 		capaInterfaz.add(representacionNumerica);
 		capaInterfaz.add(representacionBase);
