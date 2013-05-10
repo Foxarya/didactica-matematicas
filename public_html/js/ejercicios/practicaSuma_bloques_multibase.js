@@ -1,4 +1,22 @@
 
-$("<input type='text' style='position:relative; left:50px; width: 80px' readonly ></input>").prependTo('.main');
+(function(){
+	
+	var canvasInterfaz;
+	
+	var capaInterfaz = new Kinetic.Layer();
+	
+	$(document).ready(function() {
 
-$("<input type='text' style='position:relative; float:right; right:50px; width: 80px; ' ></input>").prependTo('.main');
+		canvas = new MathCanvas.Canvas({
+			capas : capaInterfaz,		
+			urlEjercicio : "img/ejercicios/practicaSuma_bloques_multibase/",
+			
+		});
+
+	});
+	
+	
+})();
+	
+	
+
