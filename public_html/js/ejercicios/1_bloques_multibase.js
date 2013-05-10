@@ -2,10 +2,14 @@ var SceneBloques;
 
 (function() {
 
-
 	var canvas;
 
-
+	/*
+	 * SceneBloques constructor
+	 * @constructor
+	 * @param {Object} config
+	 * @param {Function} config.onDrawDelegate
+	 */
 	SceneBloques = function(config) {
 		this._initScene();
 	}
@@ -26,9 +30,63 @@ var SceneBloques;
 				urlEjercicio : "img/ejercicios/1_bloques_multibase/",
 				callback : logicaJuego
 			});
+
+			canvas.on('draw', function(evt) {
+				try {
+					config.onDrawDelegate(evt);
+				} catch(e) {
+
+				}
+			});
+
+		},
+
+		getRepresentados : function() {
+			return cuentaRepresentados().texto;
+		},
+
+		getBase : function() {
+			return bases[base];
+		},
+
+		setRepresentados : function(numero) {
+			capaCubos.removeChildren();
 			
+			this.addElementos(numero);
+		},
+
+		setBase : function(base) {
+
+			var resul = canvas.cambiarBase(numeroBase10, base);
+
+			this.setRepresentados(resul);
+
+		},
+
+		addElementos : function(numero) {
+			var resul = numero + "";
+
+			if (resul.length <= 4 && resul.length != 0) {
+				for (var i = resul.length - 1; i >= 0; i--) {
+					for (var j = 0; j < resul[i]; j++) {
+						var nuevoElemento = new Elemento((botones[i].getX() - 64) + (Math.random() * 128), limiteArrastreY + (Math.random() * (canvas.tamaño().alto - limiteArrastreY - 100)), prioridad[i]);
+						nuevoElemento.setScale(0, 0);
+
+						capaCubos.add(nuevoElemento);
+
+						TweenLite.to(nuevoElemento, 0.3, {
+							setScaleX : 1,
+							setScaleY : 1,
+							ease : Back.easeOut,
+							onUpdate : function() {
+								capaCubos.batchDraw();
+							}
+						});
+					}
+				}
+			}
 		}
-	}
+	};
 	var capaBotones = new Kinetic.Layer();
 	var capaCubos = new Kinetic.Layer();
 	var capaVarios = new Kinetic.Layer();
@@ -36,6 +94,8 @@ var SceneBloques;
 	var borrando = false;
 
 	var numeroBase10 = 0;
+
+	var botones = [];
 
 	/*
 	 * CONSTANTES
@@ -393,10 +453,7 @@ var SceneBloques;
 
 	}
 
-
 	function logicaJuego() {
-
-		var botones = [];
 
 		for (var i = 0; i < 4; i++) {
 			var tipo = prioridad[i];
@@ -755,4 +812,5 @@ var SceneBloques;
 		capaCubos.draw();
 		capaVarios.draw();
 	}
+
 })();
