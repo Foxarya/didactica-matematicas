@@ -44,19 +44,19 @@ var SceneBloques;
 	var posiciones = {
 		bloque : {
 			x : 128,
-			y : 130
+			y : 50
 		},
 		placa : {
 			x : 385,
-			y : 130
+			y : 50
 		},
 		barra : {
 			x : 641,
-			y : 130
+			y : 50
 		},
 		cubo : {
 			x : 898,
-			y : 130
+			y : 50
 		}
 
 	};
@@ -71,7 +71,7 @@ var SceneBloques;
 
 	var base = 3;
 
-	var limiteArrastreY = 210;
+	var limiteArrastreY = 130;
 
 	var consejos = {
 		sacarNuevoElemento : {
@@ -473,7 +473,7 @@ var SceneBloques;
 
 		botonLimpiar.setId("papelera");
 
-		var representacionNumerica = new Kinetic.Text({
+		/*var representacionNumerica = new Kinetic.Text({
 			x : canvas.tamaño().ancho / 2,
 			y : 15,
 			text : '0 0 0 0 ',
@@ -601,7 +601,7 @@ var SceneBloques;
 		capaBotones.add(btnBajarBase);
 
 		capaBotones.add(representacionNumerica);
-		capaBotones.add(representacionBase);
+		capaBotones.add(representacionBase);*/
 
 		capaVarios.add(botonLimpiar);
 
@@ -654,7 +654,7 @@ var SceneBloques;
 
 		 consejos.start();*/
 
-		var limiteRepresentacionGrafica = new Kinetic.Text({
+		/*var limiteRepresentacionGrafica = new Kinetic.Text({
 			x : canvas.tamaño().ancho / 2,
 			y : 70,
 			text : 'El número no se puede representar gráficamente',
@@ -750,7 +750,7 @@ var SceneBloques;
 			capaBotones.draw();
 
 		});
-
+*/
 		capaBotones.draw();
 		capaCubos.draw();
 		capaVarios.draw();
