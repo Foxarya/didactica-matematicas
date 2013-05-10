@@ -50,13 +50,10 @@
 		<div class="main-container">
 			<div class="main wrapper clearfix">
 
-				<section id="container" style="border: 2px solid black">
+				<section class="contenedor">
 					<!--<div id="container" style="border: 2px solid black"></div>-->
 					<script>
-						var canvas = document.getElementById('container');
-						canvas.onselectstart = function() {
-							return false;
-						}
+						
 						function getUrlVars() {
 							var vars = {};
 							var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {

@@ -368,8 +368,11 @@
 
 
 	$(document).ready(function() {
+		
+		$("<div id='canvasJuego' style='border: 2px solid black'></div>").prependTo('.contenedor');
 
 		canvas = new MathCanvas.Canvas({
+			container: 'canvasJuego',
 			capas : [capaVarios, capaBotones, capaCubos],
 			ancho: 1026,
 			alto: 545,
@@ -380,6 +383,8 @@
 			urlEjercicio : "img/ejercicios/1_bloques_multibase/",
 			callback : logicaJuego
 		});
+		
+		
 
 	});
 

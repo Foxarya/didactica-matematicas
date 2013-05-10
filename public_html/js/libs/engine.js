@@ -54,6 +54,7 @@ var MathCanvas = {};
 	 * Escenario constructor
 	 * @constructor
 	 * @param {Object} config
+	 * @param {String} config.container
 	 * @param {Array|Kinetic.Layer} config.capas
 	 * @param {Integer} config.ancho
 	 * @param {Integer} config.alto
@@ -76,7 +77,7 @@ var MathCanvas = {};
 			this.capaEngine = new Kinetic.Layer();
 
 			this.escenario = new Kinetic.Stage({
-				container : 'container',
+				container : config.container,
 				width : config.ancho,
 				height : config.alto,
 				draggable : true,
@@ -88,6 +89,9 @@ var MathCanvas = {};
 				}
 			});
 
+			document.getElementById(config.container).onselectstart = function() {
+				return false;
+			}
 			for (var capa in config.capas) {
 				this.escenario.add(config.capas[capa]);
 			}
@@ -96,15 +100,16 @@ var MathCanvas = {};
 
 			$(window).resize({
 				canvas : this,
+				container : config.container,
 				anchoOriginal : config.ancho,
 				altoOriginal : config.alto
 			}, function(event) {
 
-				$('#container').attr('width', $('#container').parent().width());
-				$('#container').attr('height', $('#container').parent().width() / (event.data.anchoOriginal / event.data.altoOriginal));
-				event.data.canvas.escenario.setWidth($('#container').parent().width());
-				event.data.canvas.escenario.setHeight($('#container').parent().width() / (event.data.anchoOriginal / event.data.altoOriginal));
-				event.data.canvas.escenario.setScale($('#container').width() / event.data.anchoOriginal, $('#container').height() / event.data.altoOriginal);
+				$('#'+event.data.container).attr('width', $('#'+event.data.container).parent().width());
+				$('#'+event.data.container).attr('height', $('#'+event.data.container).parent().width() / (event.data.anchoOriginal / event.data.altoOriginal));
+				event.data.canvas.escenario.setWidth($('#'+event.data.container).parent().width());
+				event.data.canvas.escenario.setHeight($('#'+event.data.container).parent().width() / (event.data.anchoOriginal / event.data.altoOriginal));
+				event.data.canvas.escenario.setScale($('#'+event.data.container).width() / event.data.anchoOriginal, $('#'+event.data.container).height() / event.data.altoOriginal);
 
 			});
 
