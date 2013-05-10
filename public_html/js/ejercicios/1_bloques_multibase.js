@@ -367,9 +367,9 @@
 	}
 
 
-	$(document).ready(function() {
+	function initJuego() {
 		
-		$("<div id='canvasJuego' style='border: 2px solid black'></div>").prependTo('.contenedor');
+		$("<div id='canvasJuego' style='border: 2px solid black;border-top:0px'></div>").prependTo('.contenedor');
 
 		canvas = new MathCanvas.Canvas({
 			container: 'canvasJuego',
@@ -386,7 +386,7 @@
 		
 		
 
-	});
+	}
 
 	function logicaJuego() {
 
@@ -749,5 +749,6 @@
 		capaCubos.draw();
 		capaVarios.draw();
 	}
-
+	
+	initJuego();
 })();

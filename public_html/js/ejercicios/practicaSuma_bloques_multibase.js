@@ -1,22 +1,25 @@
+(function() {
 
-(function(){
-	
 	var canvasInterfaz;
-	
+
 	var capaInterfaz = new Kinetic.Layer();
-	
+
 	$(document).ready(function() {
 
-		canvas = new MathCanvas.Canvas({
-			capas : capaInterfaz,		
-			urlEjercicio : "img/ejercicios/practicaSuma_bloques_multibase/",
-			
+		$.getScript("js/ejercicios/1_bloques_multibase.js").done(function(script, textStatus) {
+			$("<div id='canvasInterfaz' style='border: 2px solid black;border-bottom:0px'></div>").prependTo('.contenedor');
+
+			canvas = new MathCanvas.Canvas({
+				container : 'canvasInterfaz',
+				capas : capaInterfaz,
+				ancho : 1026,
+				alto : 80,
+				urlEjercicio : "img/ejercicios/practicaSuma_bloques_multibase/",
+
+			});
 		});
 
 	});
-	
-	
+
 })();
-	
-	
 
