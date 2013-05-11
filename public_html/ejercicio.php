@@ -15,9 +15,18 @@
 		<link rel="stylesheet" href="css/normalize.min.css">
 		<link rel="stylesheet" href="css/main.css">
 
-		<script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
-
-		<script src="http://code.jquery.com/jquery-1.4.2.js" ></script>
+		<script src="scripts/require.js"></script>
+		<script>
+			require.config({
+			    baseUrl: "scripts"
+			});
+			require(["vendor/modernizr-2.6.2-respond-1.1.0.min"]);
+			require(["vendor/jquery-1.9.1"]);
+			require(["libs/EasePack.min", "libs/TweenLite.min", "libs/kinetic-v4.5.0.min",], function() {
+				require(["libs/engine"]);
+				require(["ejercicios/<?php echo $_GET['e']; ?>"]);
+			});
+		</script>
 
 	</head>
 	<body>
@@ -39,11 +48,6 @@
 					</ul>
 				</nav>
 
-				<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
-				<script>
-					window.jQuery || document.write('<script src="js/vendor/jquery-1.9.1.js"><\/script>')
-				</script>
-
 			</header>
 		</div>
 
@@ -51,27 +55,6 @@
 			<div class="main wrapper clearfix">
 
 				<section class="contenedor">
-					<!--<div id="container" style="border: 2px solid black"></div>-->
-					<script>
-						
-						function getUrlVars() {
-							var vars = {};
-							var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-								vars[key] = value;
-							});
-							return vars;
-						}
-					</script>
-					<script src="js/libs/kinetic-v4.5.0.min.js"></script>
-					<script src="js/libs/EasePack.min.js"></script>
-					<script src="js/libs/TweenLite.min.js"></script>
-					
-					<script src="js/libs/engine.js" defer="defer"></script>
-					<script>
-						$.getScript("js/ejercicios/" + getUrlVars()["e"] + ".js").fail(function(jqxhr, settings, exception) {
-							//window.location.href = "index.html";
-						});
-					</script>
 
 				</section>
 

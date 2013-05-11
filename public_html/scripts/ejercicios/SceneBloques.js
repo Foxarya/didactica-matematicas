@@ -8,10 +8,11 @@ var SceneBloques;
 	 * SceneBloques constructor
 	 * @constructor
 	 * @param {Object} config
+	 * @param {Integer} config.base
 	 * @param {Function} config.onDrawDelegate
 	 */
 	SceneBloques = function(config) {
-		this._initScene();
+		this._initScene(config);
 	}
 
 	SceneBloques.prototype = {
@@ -22,7 +23,7 @@ var SceneBloques;
 				container : 'canvasJuego',
 				capas : [capaVarios, capaBotones, capaCubos],
 				ancho : 1026,
-				alto : 545,
+				alto : 465,
 				seleccion : {
 					capa : capaCubos,
 					callback : agrupar
@@ -31,18 +32,48 @@ var SceneBloques;
 				callback : logicaJuego
 			});
 
-			canvas.on('draw', function(evt) {
-				try {
-					config.onDrawDelegate(evt);
-				} catch(e) {
+			this.canvas = canvas;
+			
+			base = bases.indexOf(config.base);
+			
+			if(base == -1) base = 3;
 
+			var that = this;
+			capaCubos.on('draw', function(evt) {
+
+				try {
+					var potencia = 3;
+					for (var i in botones) {
+						if (that.getRepresentados().base10 + Math.pow(bases[base], potencia) > limites[base]) {
+							if (botones[i].isListening()) {
+								botones[i].setOpacity(0.5);
+								botones[i].setListening(false);
+							}
+						} else {
+							botones[i].setListening(true);
+							botones[i].setOpacity(1);
+						}
+						potencia--;
+					}
+					
+					if(typeof config.onDrawDelegate != "undefined")
+						config.onDrawDelegate(evt);
+						
+					capaBotones.draw();
+				} catch(e) {
+					console.log(e);
 				}
 			});
 
 		},
 
+		getNumero : function() {
+			return numeroBase10;
+		},
+
 		getRepresentados : function() {
-			return cuentaRepresentados().texto;
+
+			return cuentaRepresentados();
 		},
 
 		getBase : function() {
@@ -51,20 +82,24 @@ var SceneBloques;
 
 		setRepresentados : function(numero) {
 			capaCubos.removeChildren();
-			
+
 			this.addElementos(numero);
 		},
 
-		setBase : function(base) {
+		setBase : function(nuevaBase) {
 
-			var resul = canvas.cambiarBase(numeroBase10, base);
+			if (this.getRepresentados().base10 != numeroBase10 && this.getRepresentados().base10 != 0) {
+				numeroBase10 = this.getRepresentados().base10;
+			}
+			var resul = canvas.cambiarBase(numeroBase10, nuevaBase);
+
+			base = bases.indexOf(nuevaBase);
 
 			this.setRepresentados(resul);
 
 		},
 
-		addElementos : function(numero) {
-			var resul = numero + "";
+		addElementos : function(resul) {
 
 			if (resul.length <= 4 && resul.length != 0) {
 				for (var i = resul.length - 1; i >= 0; i--) {
@@ -85,7 +120,39 @@ var SceneBloques;
 					}
 				}
 			}
-		}
+
+			capaCubos.draw();
+		},
+
+		aumentarBase : function() {
+
+			if (this.sePuedeSubirBase()) {
+				this.setBase(bases[base + 1]);
+			}
+
+		},
+
+		disminuirBase : function() {
+			if (this.sePuedeBajarBase()) {
+				//base--;
+
+				this.setBase(bases[base - 1]);
+			}
+		},
+
+		sePuedeSubirBase : function() {
+			if (base + 1 < bases.length) {
+				return true;
+			}
+			return false;
+		},
+		
+		sePuedeBajarBase : function() {
+			if (base - 1 >= 0) {
+				return true;
+			}
+			return false;
+		}, 
 	};
 	var capaBotones = new Kinetic.Layer();
 	var capaCubos = new Kinetic.Layer();
@@ -117,6 +184,10 @@ var SceneBloques;
 		cubo : {
 			x : 898,
 			y : 50
+		},
+		papelera : {
+			x : 966,
+			y : 426,
 		}
 
 	};
@@ -277,24 +348,21 @@ var SceneBloques;
 						capaCubos.batchDraw();
 					},
 					onComplete : function() {
+						
+						elemento.destroy();
+						
 						agrupados++;
 
 						if (agrupados == bases[base] * grupos.length) {
 
 							var numeroNuevosElementos = grupos.length;
 
-							for (var z = 0; z < grupos.length; z++) {
-								grupos[z].each(function(elemento) {
-									elemento.destroy();
-								});
-							}
 							for (var n = 0; n < numeroNuevosElementos; n++) {
 								var siguiente = new Elemento(coordenadas[n].x, coordenadas[n].y, prioridad[tipo - 1]);
 
 								siguiente.setScale(0);
 
 								capaCubos.add(siguiente);
-								capaCubos.draw();
 
 								TweenLite.to(siguiente, 0.5, {
 									setScaleX : 1,
@@ -376,7 +444,7 @@ var SceneBloques;
 
 						}
 						sprite.destroy();
-						capaCubos.draw();
+						//capaCubos.draw();
 					}
 				})
 
@@ -491,8 +559,8 @@ var SceneBloques;
 		}
 
 		var botonLimpiar = new MathCanvas.Boton({
-			x : 966,
-			y : 506,
+			x : posiciones.papelera.x,
+			y : posiciones.papelera.y,
 			ancho : 32,
 			alto : 32,
 			spritesheet : canvas.spritesheet,
@@ -524,141 +592,10 @@ var SceneBloques;
 						}
 					});
 				}
-				capaCubos.draw();
 			}
 		});
 
 		botonLimpiar.setId("papelera");
-
-		/*var representacionNumerica = new Kinetic.Text({
-			x : canvas.tamaño().ancho / 2,
-			y : 15,
-			text : '0 0 0 0 ',
-			fontSize : 30,
-			fontFamily : 'Calibri',
-			fill : 'black'
-		});
-		var representacionBase = new Kinetic.Text({
-			x : canvas.tamaño().ancho / 2,
-			y : 47,
-			text : 'Base ' + bases[base],
-			fontSize : 18,
-			fontFamily : 'Calibri',
-			fill : 'black'
-		});
-
-		representacionNumerica.setId("numero");
-
-		representacionBase.setX((canvas.tamaño().ancho / 2) - (representacionBase.getWidth() / 2));
-
-		var btnSubirBase = new MathCanvas.Boton({
-			x : representacionBase.getX() + representacionBase.getWidth() + 32,
-			y : 57,
-			ancho : 24,
-			alto : 24,
-			spritesheet : canvas.spritesheet,
-			imagen : "subirBase",
-			frames : canvas.frames,
-			onClick : function() {
-				if (base != bases.length - 1) {
-					if (cuentaRepresentados().base10 != numeroBase10 && cuentaRepresentados().base10 != 0) {
-						numeroBase10 = cuentaRepresentados().base10;
-					}
-					base++;
-
-					representacionBase.setText("Base " + bases[base]);
-					capaBotones.draw();
-
-					capaCubos.removeChildren();
-					var resul = canvas.cambiarBase(numeroBase10, bases[base]);
-
-					if (resul.length <= 4 && resul.length != 0) {
-						for (var i = resul.length - 1; i >= 0; i--) {
-							for (var j = 0; j < resul[i]; j++) {
-								var nuevoElemento = new Elemento((botones[i].getX() - 64) + (Math.random() * 128), limiteArrastreY + (Math.random() * (canvas.tamaño().alto - limiteArrastreY - 100)), prioridad[i]);
-								nuevoElemento.setScale(0, 0);
-
-								capaCubos.add(nuevoElemento);
-
-								TweenLite.to(nuevoElemento, 0.3, {
-									setScaleX : 1,
-									setScaleY : 1,
-									ease : Back.easeOut,
-									onUpdate : function() {
-										capaCubos.batchDraw();
-									}
-								});
-							}
-						}
-
-					}
-
-					capaCubos.draw();
-
-				}
-
-				if (base == bases.length - 1) {
-					this.hide();
-					capaBotones.draw();
-				}
-
-			}
-		});
-
-		var btnBajarBase = new MathCanvas.Boton({
-			x : representacionBase.getX() - 28,
-			y : 57,
-			ancho : 24,
-			alto : 24,
-			spritesheet : canvas.spritesheet,
-			imagen : "bajarBase",
-			frames : canvas.frames,
-			onClick : function() {
-				if (base != 0) {
-					if (numeroBase10 < limites[base - 1]) {
-						numeroBase10 = cuentaRepresentados().base10;
-					}
-					base--;
-					representacionBase.setText("Base " + bases[base]);
-					capaBotones.draw();
-					capaCubos.removeChildren();
-					var resul = canvas.cambiarBase(numeroBase10, bases[base]);
-
-					if (resul.length <= 4 && resul.length != 0) {
-						for (var i = resul.length - 1; i >= 0; i--) {
-							for (var j = 0; j < resul[i]; j++) {
-								var nuevoElemento = new Elemento((botones[i].getX() - 64) + (Math.random() * 128), limiteArrastreY + (Math.random() * (canvas.tamaño().alto - limiteArrastreY - 100)), prioridad[i]);
-								nuevoElemento.setScale(0, 0);
-
-								capaCubos.add(nuevoElemento);
-
-								TweenLite.to(nuevoElemento, 0.3, {
-									setScaleX : 1,
-									setScaleY : 1,
-									ease : Back.easeOut,
-									onUpdate : function() {
-										capaCubos.batchDraw();
-									}
-								});
-							}
-						}
-					}
-					capaCubos.draw();
-				}
-
-				if (base == 0) {
-					this.hide();
-					capaBotones.draw();
-				}
-
-			}
-		});
-
-		capaBotones.add(btnSubirBase);
-		capaBotones.add(btnBajarBase);
-
-		capaBotones.add(representacionNumerica);
-		capaBotones.add(representacionBase);*/
 
 		capaVarios.add(botonLimpiar);
 
@@ -711,103 +648,6 @@ var SceneBloques;
 
 		 consejos.start();*/
 
-		/*var limiteRepresentacionGrafica = new Kinetic.Text({
-			x : canvas.tamaño().ancho / 2,
-			y : 70,
-			text : 'El número no se puede representar gráficamente',
-			fontSize : 18,
-			fontFamily : 'Calibri',
-			fill : 'red'
-		});
-
-		var agrupacionPosible = new Kinetic.Text({
-			x : canvas.tamaño().ancho / 2,
-			y : 70,
-			text : 'Hay elementos que pueden agruparse',
-			fontSize : 18,
-			fontFamily : 'Calibri',
-			fill : 'red'
-		});
-
-		limiteRepresentacionGrafica.setX((canvas.tamaño().ancho / 2) - (limiteRepresentacionGrafica.getWidth() / 2));
-		agrupacionPosible.setX((canvas.tamaño().ancho / 2) - (agrupacionPosible.getWidth() / 2));
-
-		capaBotones.add(limiteRepresentacionGrafica);
-		capaBotones.add(agrupacionPosible);
-
-		capaCubos.on('draw', function() {
-
-			var cuenta = cuentaRepresentados();
-
-			var potencia = 3;
-			for (var i in botones) {
-				if (cuenta.base10 + Math.pow(bases[base], potencia) > limites[base]) {
-					if (botones[i].isListening()) {
-						botones[i].setOpacity(0.5);
-						botones[i].setListening(false);
-					}
-				} else {
-					botones[i].setListening(true);
-					botones[i].setOpacity(1);
-				}
-				potencia--;
-			}
-
-			if (cuenta.base10 == 0 && numeroBase10 != 0) {
-
-				var resul = canvas.cambiarBase(numeroBase10, bases[base]);
-				var texto = "";
-				for (var i = 0; i < resul.length; i++) {
-					texto += resul[i] + " ";
-				}
-				representacionNumerica.setText(texto);
-
-				//Aquí se avisa que el número no se puede representar gráficamente en la base actual.
-
-				if (!limiteRepresentacionGrafica.isVisible())
-					limiteRepresentacionGrafica.show();
-
-			} else {
-
-				if (cuenta.texto == "nada") {
-
-					representacionNumerica.hide();
-
-					//Aquí se avisa que quedan elementos por agrupar.
-
-					if (!agrupacionPosible.isVisible())
-						agrupacionPosible.show();
-
-				} else {
-					if (!representacionNumerica.isVisible())
-						representacionNumerica.show();
-
-					representacionNumerica.setText(cuenta.texto);
-
-					//Aquí habría que comprobar si hay avisos mostrándose y hacerlos desaparecer
-
-					if (limiteRepresentacionGrafica.isVisible())
-						limiteRepresentacionGrafica.hide();
-
-					if (agrupacionPosible.isVisible())
-						agrupacionPosible.hide();
-
-				}
-			}
-
-			if (base != 0 && !btnBajarBase.isVisible()) {
-				btnBajarBase.show();
-			}
-
-			if (base != bases.length - 1 && !btnSubirBase.isVisible()) {
-				btnSubirBase.show();
-			}
-
-			representacionNumerica.setX((canvas.tamaño().ancho / 2) - (representacionNumerica.getWidth() / 2));
-			capaBotones.draw();
-
-		});
-*/
 		capaBotones.draw();
 		capaCubos.draw();
 		capaVarios.draw();
